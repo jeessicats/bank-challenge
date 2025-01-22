@@ -1,4 +1,4 @@
-package br.com.compass;
+package br.com.compass.config;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
