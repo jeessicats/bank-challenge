@@ -42,7 +42,11 @@ public class Person {
     }
 
     public void setCpf(String cpf) {
-        this.cpf = cpf;
+        if (cpf != null && cpf.matches("\\d{11}")) {
+            this.cpf = cpf;
+        } else {
+            throw new IllegalArgumentException("Invalid CPF. It must contain 11 digits.");
+        }
     }
 
     public String getPhone() {
@@ -58,7 +62,11 @@ public class Person {
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        if (email != null && email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+            this.email = email;
+        } else {
+            throw new IllegalArgumentException("Invalid email format.");
+        }
     }
 
     public String getAddress() {
@@ -71,13 +79,11 @@ public class Person {
 
     @Override
     public String toString() {
-        return "Person{" +
-                "name='" + name + '\'' +
-                ", birthDate='" + birthDate + '\'' +
-                ", cpf='" + cpf + '\'' +
-                ", phone='" + phone + '\'' +
-                ", email='" + email + '\'' +
-                ", address='" + address + '\'' +
-                '}';
+        return  "Name: " + name + "\n" +
+                "Birth Date: " + birthDate + "\n" +
+                "CPF: " + cpf + "\n" +
+                "Phone: " + phone + "\n" +
+                "Email: " + email + "\n" +
+                "Address: " + address;
     }
 }
