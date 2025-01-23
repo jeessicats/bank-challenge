@@ -9,7 +9,7 @@ public class Account {
     private Person person; // Relacionamento com Person
     private AccountType accountType;
     private BigDecimal balance;
-    private String status;
+    private AccountStatus status;
     private LocalDateTime creationDate;
 
     // Construtor padrão
@@ -21,20 +21,18 @@ public class Account {
         setPerson(person);
         setAccountType(accountType);
         this.balance = BigDecimal.ZERO;
-        this.status = "ACTIVE";
+        this.status = AccountStatus.ACTIVE;
         this.creationDate = LocalDateTime.now();
     }
 
     // Construtor completo
-
-
-    public Account(int id, Person person, AccountType accountType, BigDecimal balance, String status, LocalDateTime creationDate) {
+    public Account(int id, Person person, AccountType accountType, BigDecimal balance, AccountStatus status, LocalDateTime creationDate) {
         this.id = id;
-        this.person = person;
-        this.accountType = accountType;
-        this.balance = balance;
-        this.status = status;
-        this.creationDate = creationDate;
+        setPerson(person);
+        setAccountType(accountType);
+        setBalance(balance);
+        setStatus(status);
+        this.creationDate = creationDate != null ? creationDate : LocalDateTime.now();
     }
 
     public int getId() {
@@ -78,13 +76,13 @@ public class Account {
         this.balance = balance;
     }
 
-    public String getStatus() {
+    public AccountStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
-        if (!status.equals("ACTIVE") && !status.equals("BLOCKED") && !status.equals("CLOSED")) {
-            throw new IllegalArgumentException("Invalid status");
+    public void setStatus(AccountStatus status) {
+        if (status == null) {
+            throw new IllegalArgumentException("Account status cannot be null");
         }
         this.status = status;
     }
