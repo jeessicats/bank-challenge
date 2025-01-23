@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 public class TestApplication {
     public static void main(String[] args) {
 
-        // Limpar a tabela antes dos testes
+        // Limpar a tabela antes de começar os testes
         DatabaseUtil.clearAccountsTable();
 
         // Teste da classe Person
@@ -31,11 +31,31 @@ public class TestApplication {
         System.out.println("\nTesting Account class:");
         System.out.println(account);
 
-        // Alteração do saldo para valor negativo para testar validação
+        System.out.println("Initial balance: " + account.getBalance());
+
+        // Realizar um depósito válido
+        account.deposit(new BigDecimal("100.00"));
+        System.out.println("Balance after deposit: " + account.getBalance());
+
+        // Tentar um depósito inválido (valor negativo)
         try {
-            account.setBalance(new BigDecimal("-10.00"));
+            account.deposit(new BigDecimal("-50.00"));
         } catch (IllegalArgumentException e) {
-            System.out.println("\nValidation Test: " + e.getMessage());
+            System.out.println("Validation test: " + e.getMessage());
+        }
+
+        // Tentar um depósito inválido (valor zero)
+        try {
+            account.deposit(BigDecimal.ZERO);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Validation test: " + e.getMessage());
+        }
+
+        // Tentar um depósito inválido (letras)
+        try {
+            account.deposit(new BigDecimal("cinquenta reais"));
+        } catch (IllegalArgumentException e) {
+            System.out.println("Validation test: " + e.getMessage());
         }
 
         System.out.println("\nAccount creation test completed.");

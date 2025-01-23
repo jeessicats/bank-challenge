@@ -97,6 +97,14 @@ public class Account {
         this.creationDate = creationDate;
     }
 
+    public void deposit(BigDecimal amount) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Deposit amount must be greater than zero");
+        }
+        this.balance = this.balance.add(amount);
+        System.out.println("Successfully deposited: " + amount);
+    }
+
     @Override
     public String toString() {
         return "Account{" +
