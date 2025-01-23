@@ -2,26 +2,30 @@ package br.com.compass;
 
 import br.com.compass.model.Account;
 import br.com.compass.model.Person;
-import br.com.compass.service.AccountService;
+import br.com.compass.util.DatabaseUtil;
 
 import java.math.BigDecimal;
 
 public class TestApplication {
     public static void main(String[] args) {
+
+        // Limpar a tabela antes dos testes
+        DatabaseUtil.clearAccountsTable();
+
         // Testando a classe Person
-        Person person = new Person(
-                "Olivia Willow",
-                "1990-01-01",
-                "12345678901",
-                "5551234567",
-                "olivia.willow@example.com",
-                "123 Main St"
+        Person johnDoe = new Person(
+                "John Doe",
+                "1985-05-15",
+                "98765432100",
+                "5559876543",
+                "john.doe@example.com",
+                "456 Elm St"
         );
         System.out.println("Testing Person class:");
-        System.out.println(person);
+        System.out.println(johnDoe);
 
         // Testando a classe Account
-        Account account = new Account(person, "Savings");
+        Account account = new Account(johnDoe, "Savings");
         System.out.println("\nTesting Account class:");
         System.out.println(account);
 
@@ -31,19 +35,6 @@ public class TestApplication {
         } catch (IllegalArgumentException e) {
             System.out.println("\nValidation Test: " + e.getMessage());
         }
-
-        // Testando o metodo openAccount da classe AccountService
-        AccountService accountService = new AccountService();
-        System.out.println("\nTesting AccountService:");
-        accountService.openAccount(
-                person.getName(),
-                person.getBirthDate(),
-                person.getCpf(),
-                person.getPhone(),
-                person.getEmail(),
-                person.getAddress(),
-                "Savings"
-        );
 
         System.out.println("\nAccount creation test completed.");
     }
