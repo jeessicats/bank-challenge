@@ -33,31 +33,36 @@ public class TestApplication {
 
         System.out.println("Initial balance: " + account.getBalance());
 
-        // Realizar um depósito válido
-        account.deposit(new BigDecimal("100.00"));
-        System.out.println("Balance after deposit: " + account.getBalance());
+        System.out.println("");
 
-        // Tentar um depósito inválido (valor negativo)
+        // Teste realização de depositos
+        performDeposit(account, new BigDecimal("100.00")); // Depósito válido
+        performDeposit(account, new BigDecimal("-100.00")); // Valor inválido (negativo)
+        performDeposit(account, BigDecimal.ZERO); // Valor inválido (zero)
+
+        System.out.println("");
+
+        // Teste realização de saques
+        performWithdrawal(account, new BigDecimal("50.00")); // Saque válido
+        performWithdrawal(account, new BigDecimal("200.00")); // Saldo insuficiente
+        performWithdrawal(account, BigDecimal.ZERO); // Valor inválido
+
+    }
+    private static void performDeposit(Account account, BigDecimal amount) {
         try {
-            account.deposit(new BigDecimal("-50.00"));
+            account.deposit(amount);
+            System.out.println("Balance after deposit: " + account.getBalance());
         } catch (IllegalArgumentException e) {
-            System.out.println("Validation test: " + e.getMessage());
+            System.out.println("Error: " + e.getMessage());
         }
+    }
 
-        // Tentar um depósito inválido (valor zero)
+    private static void performWithdrawal(Account account, BigDecimal amount) {
         try {
-            account.deposit(BigDecimal.ZERO);
+            account.withdrawal(amount);
+            System.out.println("Balance after withdrawal: " + account.getBalance());
         } catch (IllegalArgumentException e) {
-            System.out.println("Validation test: " + e.getMessage());
+            System.out.println("Error: " + e.getMessage());
         }
-
-        // Tentar um depósito inválido (letras)
-        try {
-            account.deposit(new BigDecimal("cinquenta reais"));
-        } catch (IllegalArgumentException e) {
-            System.out.println("Validation test: " + e.getMessage());
-        }
-
-        System.out.println("\nAccount creation test completed.");
     }
 }

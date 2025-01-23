@@ -105,6 +105,16 @@ public class Account {
         System.out.println("Successfully deposited: " + amount);
     }
 
+    public void withdrawal(BigDecimal amount) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Withdrawal amount must be greater than zero");
+        } else if (this.balance.subtract(amount).compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Insufficient balance for withdrawal");
+        }
+        this.balance = this.balance.subtract(amount);
+        System.out.println("Successfully withdrawn: " + amount);
+    }
+
     @Override
     public String toString() {
         return "Account{" +
