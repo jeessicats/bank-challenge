@@ -1,6 +1,7 @@
 package br.com.compass;
 
 import br.com.compass.model.Account;
+import br.com.compass.model.AccountType;
 import br.com.compass.model.Person;
 import br.com.compass.util.DatabaseUtil;
 
@@ -26,7 +27,7 @@ public class TestApplication {
         System.out.println(oliviaWillow);
 
         // Teste da classe Account
-        Account account = new Account(oliviaWillow, "Savings");
+        Account account = new Account(oliviaWillow, AccountType.SAVINGS);
         System.out.println("\nTesting Account class:");
         System.out.println(account);
 

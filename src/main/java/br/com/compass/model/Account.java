@@ -7,7 +7,7 @@ public class Account {
 
     private int id;
     private Person person; // Relacionamento com Person
-    private String accountType;
+    private AccountType accountType;
     private BigDecimal balance;
     private String status;
     private LocalDateTime creationDate;
@@ -17,7 +17,7 @@ public class Account {
     }
 
     // Construtor simplificado (campos obrigatórios)
-    public Account(Person person, String accountType) {
+    public Account(Person person, AccountType accountType) {
         setPerson(person);
         setAccountType(accountType);
         this.balance = BigDecimal.ZERO;
@@ -26,11 +26,13 @@ public class Account {
     }
 
     // Construtor completo
-    public Account(int id, Person person, String accountType, BigDecimal balance, String status, LocalDateTime creationDate) {
+
+
+    public Account(int id, Person person, AccountType accountType, BigDecimal balance, String status, LocalDateTime creationDate) {
         this.id = id;
         this.person = person;
         this.accountType = accountType;
-        this.balance = balance; // reais
+        this.balance = balance;
         this.status = status;
         this.creationDate = creationDate;
     }
@@ -54,13 +56,13 @@ public class Account {
         this.person = person;
     }
 
-    public String getAccountType() {
+    public AccountType getAccountType() {
         return accountType;
     }
 
-    public void setAccountType(String accountType) {
-        if (accountType == null || accountType.isEmpty()) {
-            throw new IllegalArgumentException("Account type cannot be null or empty");
+    public void setAccountType(AccountType accountType) {
+        if (accountType == null) {
+            throw new IllegalArgumentException("Account type cannot be null");
         }
         this.accountType = accountType;
     }
