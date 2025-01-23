@@ -30,7 +30,7 @@ public class Account {
         this.id = id;
         this.person = person;
         this.accountType = accountType;
-        this.balance = balance;
+        this.balance = balance; // reais
         this.status = status;
         this.creationDate = creationDate;
     }

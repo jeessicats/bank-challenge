@@ -12,26 +12,27 @@ public class TestApplication {
         // Limpar a tabela antes dos testes
         DatabaseUtil.clearAccountsTable();
 
-        // Testando a classe Person
-        Person johnDoe = new Person(
-                "John Doe",
-                "1985-05-15",
-                "98765432100",
-                "5559876543",
-                "john.doe@example.com",
-                "456 Elm St"
+        // Teste da classe Person
+        Person oliviaWillow = new Person(
+                "Olivia Willow",
+                "1990-01-01",
+                "12345678901",
+                "5551234567",
+                "olivia.willow@example.com",
+                "123 Main St"
         );
-        System.out.println("Testing Person class:");
-        System.out.println(johnDoe);
 
-        // Testando a classe Account
-        Account account = new Account(johnDoe, "Savings");
+        System.out.println("Testing Person class:");
+        System.out.println(oliviaWillow);
+
+        // Teste da classe Account
+        Account account = new Account(oliviaWillow, "Savings");
         System.out.println("\nTesting Account class:");
         System.out.println(account);
 
-        // Alterando o saldo para testar validação
+        // Alteração do saldo para valor negativo para testar validação
         try {
-            account.setBalance(new BigDecimal("-10.00")); // Deve lançar exceção
+            account.setBalance(new BigDecimal("-10.00"));
         } catch (IllegalArgumentException e) {
             System.out.println("\nValidation Test: " + e.getMessage());
         }

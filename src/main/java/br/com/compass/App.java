@@ -1,4 +1,4 @@
-package br.com.compass.controller;
+package br.com.compass;
 
 import java.util.Scanner;
 
