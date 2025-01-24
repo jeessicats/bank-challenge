@@ -144,17 +144,17 @@ public class Account {
         this.withdrawal(transferAmount); // Saque da conta de origem
         destinationAccount.deposit(transferAmount); // Depósito na conta de destino
 
-        // Exibir mensagem de transferência com nome e CPF
+        // Exibir mensagem de transferência com nome completo e CPF
         System.out.println("Successfully transferred: " + transferAmount +
-                "\nFrom: " + this.client.getName() + " (CPF: " + this.client.getCpf() + ")" +
-                "\nTo: " + destinationAccount.getClient().getName() + " (CPF: " + destinationAccount.getClient().getCpf() + ")");
+                "\nFrom: " + this.client.getFullName() + " (CPF: " + this.client.getCpf() + ")" +
+                "\nTo: " + destinationAccount.getClient().getFullName() + " (CPF: " + destinationAccount.getClient().getCpf() + ")");
     }
 
     @Override
     public String toString() {
         return "Account{" +
                 "id=" + id +
-                ", clientName=" + client.getName() +
+                ", clientName=" + client.getFullName() +
                 ", accountType='" + accountType + '\'' +
                 ", balance=" + balance +
                 ", status='" + status + '\'' +

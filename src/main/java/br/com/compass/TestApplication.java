@@ -16,17 +16,23 @@ public class TestApplication {
         // Limpar a tabela antes de começar os testes
         DatabaseUtil.clearAccountsTable();
 
-        // Teste da classe Person
+        // Teste da classe Client
         Client oliviaWillow = new Client(
-                "Olivia Willow",
-                LocalDate.parse("01/01/1990", formatter),
-                "12345678901",
-                "5551234567",
-                "olivia.willow@example.com",
-                "123 Main St"
+                "Olivia Willow",                        // Nome completo
+                LocalDate.parse("01/01/1990", formatter), // Data de nascimento
+                "12345678901",                          // CPF
+                "5551234567",                           // Telefone
+                "olivia.willow@example.com",            // Email
+                "Main St",                              // Nome da rua
+                123,                                    // Número da rua
+                "Downtown",                             // Bairro
+                "12345-678",                            // CEP
+                "Springfield",                          // Cidade
+                "IL",                                   // Estado
+                "USA"                                   // País
         );
 
-        System.out.println("Testing Person class:");
+        System.out.println("Testing Client class:");
         System.out.println(oliviaWillow);
 
         // Teste da classe Account
@@ -38,7 +44,7 @@ public class TestApplication {
 
         System.out.println("");
 
-        // Teste realização de depositos
+        // Teste realização de depósitos
         performDeposit(account, new BigDecimal("100.00")); // Depósito válido
         performDeposit(account, new BigDecimal("-100.00")); // Valor inválido (negativo)
         performDeposit(account, BigDecimal.ZERO); // Valor inválido (zero)
@@ -51,6 +57,7 @@ public class TestApplication {
         performWithdrawal(account, BigDecimal.ZERO); // Valor inválido
 
     }
+
     private static void performDeposit(Account account, BigDecimal amount) {
         try {
             account.deposit(amount);
