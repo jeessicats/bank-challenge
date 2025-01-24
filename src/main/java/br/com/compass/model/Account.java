@@ -113,6 +113,30 @@ public class Account {
         System.out.println("Successfully withdrawn: " + amount);
     }
 
+    public void transfer(Account destinationAccount, BigDecimal transferAmount) {
+        if (destinationAccount == null) {
+            throw new IllegalArgumentException("Destination account cannot be null");
+        }
+        if (this.equals(destinationAccount)) {
+            throw new IllegalArgumentException("Cannot transfer to the same account");
+        }
+        if (transferAmount == null || transferAmount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Transfer amount must be greater than zero");
+        }
+        if (this.balance.subtract(transferAmount).compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Insufficient balance for transfer");
+        }
+
+        // Realizar a transferência
+        this.withdrawal(transferAmount); // Saque da conta de origem
+        destinationAccount.deposit(transferAmount); // Depósito na conta de destino
+
+        // Exibir mensagem de transferência com nome e CPF
+        System.out.println("Successfully transferred: " + transferAmount +
+                "\nFrom: " + this.person.getName() + " (CPF: " + this.person.getCpf() + ")" +
+                "\nTo: " + destinationAccount.getPerson().getName() + " (CPF: " + destinationAccount.getPerson().getCpf() + ")");
+    }
+
     @Override
     public String toString() {
         return "Account{" +
