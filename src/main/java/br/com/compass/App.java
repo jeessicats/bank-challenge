@@ -118,6 +118,9 @@ public class App {
             System.out.print("Enter your email: ");
             String email = scanner.nextLine();
 
+            System.out.print("Enter your password (must contains at least 8 characters and at least an upper letter): ");
+            String password = scanner.nextLine();
+
             // Solicitação do endereço
             System.out.println("Address");
             System.out.print("Enter your street name: ");
@@ -143,7 +146,7 @@ public class App {
             String country = scanner.nextLine();
 
             // Criar o cliente com os novos atributos
-            Client client = new Client(fullName, birthDate, cpf, phoneNumber, email,
+            Client client = new Client(fullName, birthDate, cpf, phoneNumber, email, password,
                     streetName, streetNumber, neighborhood, postalCode, city, state, country);
 
             // Solicitar o tipo de conta

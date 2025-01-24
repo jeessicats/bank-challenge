@@ -9,6 +9,7 @@ public class Client {
     private String cpf;
     private String phoneNumber;
     private String email;
+    private String password;
     private String streetName;
     private int streetNumber;
     private String neighborhood;
@@ -22,7 +23,7 @@ public class Client {
     }
 
     // Construtor com todos os atributos
-    public Client(String fullName, LocalDate birthDate, String cpf, String phoneNumber, String email,
+    public Client(String fullName, LocalDate birthDate, String cpf, String phoneNumber, String email, String password,
                   String streetName, int streetNumber, String neighborhood, String postalCode,
                   String city, String state, String country) {
         setFullName(fullName);
@@ -30,6 +31,7 @@ public class Client {
         setCpf(cpf);
         setPhoneNumber(phoneNumber);
         setEmail(email);
+        setPassword(password);
         setStreetName(streetName);
         setStreetNumber(streetNumber);
         setNeighborhood(neighborhood);
@@ -55,9 +57,20 @@ public class Client {
         return birthDate;
     }
 
+    // adicionar metodo checar se é maior de 18 anos e tem menos 130 anos
     public void setBirthDate(LocalDate birthDate) {
         if (birthDate == null || birthDate.isAfter(LocalDate.now())) {
             throw new IllegalArgumentException("Birth date must be a valid date in the past.");
+        }
+        int age = LocalDate.now().getYear() - birthDate.getYear();
+        if (birthDate.plusYears(age).isAfter(LocalDate.now())) {
+            age--; // Corrige a data de nascimento levando em conta o mês de nascimento
+        }
+        if (age < 18) {
+            throw new IllegalArgumentException("Client must be at least 18 years old.");
+        }
+        if (age > 100) {
+            throw new IllegalArgumentException("Client age cannot exceed 100 years.");
         }
         this.birthDate = birthDate;
     }
@@ -93,6 +106,17 @@ public class Client {
             throw new IllegalArgumentException("Invalid email format.");
         }
         this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        if (password == null || password.length() < 8 || !password.matches(".*\\d.*") || !password.matches(".*[A-Z].*")) {
+            throw new IllegalArgumentException("Password must be at least 8 characters long, contain a number, and an uppercase letter.");
+        }
+        this.password = password;
     }
 
     public String getStreetName() {

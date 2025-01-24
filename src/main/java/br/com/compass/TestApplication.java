@@ -18,18 +18,19 @@ public class TestApplication {
 
         // Teste da classe Client
         Client oliviaWillow = new Client(
-                "Olivia Willow",                        // Nome completo
-                LocalDate.parse("01/01/1990", formatter), // Data de nascimento
-                "12345678901",                          // CPF
-                "5551234567",                           // Telefone
-                "olivia.willow@example.com",            // Email
-                "Main St",                              // Nome da rua
-                123,                                    // Número da rua
-                "Downtown",                             // Bairro
-                "12345-678",                            // CEP
-                "Springfield",                          // Cidade
-                "IL",                                   // Estado
-                "USA"                                   // País
+                "Olivia Willow",
+                LocalDate.parse("01/01/1990", formatter),
+                "12345678901",
+                "5551234567",
+                "olivia.willow@example.com",
+                "Password123", // Adicionado o campo senha
+                "Main St",
+                123,
+                "Downtown",
+                "12345-678",
+                "Springfield",
+                "IL",
+                "USA"
         );
 
         System.out.println("Testing Client class:");
