@@ -2,13 +2,14 @@ package br.com.compass.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class Account {
 
     private int id;
     private Client client; // Relacionamento com Cliente
     private AccountType accountType; // Enum AccountType
-    private BigDecimal balance; //BigDecimal para trabalhar com dinheiro
+    private BigDecimal balance; // BigDecimal para trabalhar com dinheiro
     private AccountStatus status; // Enum AccountStatus
     private LocalDateTime creationDate;
 
@@ -16,9 +17,9 @@ public class Account {
     public Account() {
     }
 
-    // Construtor simplificado (campos obrigatórios)
+    // Construtor com campos obrigatórios
     public Account(Client client, AccountType accountType) {
-        setPerson(client);
+        setClient(client);
         setAccountType(accountType);
         this.balance = BigDecimal.ZERO;
         this.status = AccountStatus.ACTIVE;
@@ -28,7 +29,7 @@ public class Account {
     // Construtor completo
     public Account(int id, Client client, AccountType accountType, BigDecimal balance, AccountStatus status, LocalDateTime creationDate) {
         this.id = id;
-        setPerson(client);
+        setClient(client);
         setAccountType(accountType);
         setBalance(balance);
         setStatus(status);
@@ -43,13 +44,13 @@ public class Account {
         this.id = id;
     }
 
-    public Client getPerson() {
+    public Client getClient() {
         return client;
     }
 
-    public void setPerson(Client client) {
+    public void setClient(Client client) {
         if (client == null) {
-            throw new IllegalArgumentException("Person cannot be null");
+            throw new IllegalArgumentException("Client cannot be null");
         }
         this.client = client;
     }
@@ -95,6 +96,18 @@ public class Account {
         this.creationDate = creationDate;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Account account = (Account) o;
+        return getId() == account.getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getId());
+    }
+
     public void deposit(BigDecimal amount) {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Deposit amount must be greater than zero");
@@ -134,14 +147,14 @@ public class Account {
         // Exibir mensagem de transferência com nome e CPF
         System.out.println("Successfully transferred: " + transferAmount +
                 "\nFrom: " + this.client.getName() + " (CPF: " + this.client.getCpf() + ")" +
-                "\nTo: " + destinationAccount.getPerson().getName() + " (CPF: " + destinationAccount.getPerson().getCpf() + ")");
+                "\nTo: " + destinationAccount.getClient().getName() + " (CPF: " + destinationAccount.getClient().getCpf() + ")");
     }
 
     @Override
     public String toString() {
         return "Account{" +
                 "id=" + id +
-                ", personName=" + client.getName() +
+                ", clientName=" + client.getName() +
                 ", accountType='" + accountType + '\'' +
                 ", balance=" + balance +
                 ", status='" + status + '\'' +

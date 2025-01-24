@@ -3,8 +3,9 @@ package br.com.compass;
 import java.util.Scanner;
 
 public class App {
-    
+
     public static void main(String[] args) {
+
         Scanner scanner = new Scanner(System.in);
 
         mainMenu(scanner);
@@ -90,5 +91,4 @@ public class App {
             }
         }
     }
-    
 }
