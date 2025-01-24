@@ -2,21 +2,24 @@ package br.com.compass;
 
 import br.com.compass.model.Account;
 import br.com.compass.model.AccountType;
-import br.com.compass.model.Person;
+import br.com.compass.model.Client;
 import br.com.compass.util.DatabaseUtil;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class TestApplication {
     public static void main(String[] args) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         // Limpar a tabela antes de começar os testes
         DatabaseUtil.clearAccountsTable();
 
         // Teste da classe Person
-        Person oliviaWillow = new Person(
+        Client oliviaWillow = new Client(
                 "Olivia Willow",
-                "1990-01-01",
+                LocalDate.parse("01/01/1990", formatter),
                 "12345678901",
                 "5551234567",
                 "olivia.willow@example.com",

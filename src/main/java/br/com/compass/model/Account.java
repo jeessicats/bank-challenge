@@ -6,10 +6,10 @@ import java.time.LocalDateTime;
 public class Account {
 
     private int id;
-    private Person person; // Relacionamento com Person
-    private AccountType accountType;
-    private BigDecimal balance;
-    private AccountStatus status;
+    private Client client; // Relacionamento com Cliente
+    private AccountType accountType; // Enum AccountType
+    private BigDecimal balance; //BigDecimal para trabalhar com dinheiro
+    private AccountStatus status; // Enum AccountStatus
     private LocalDateTime creationDate;
 
     // Construtor padrão
@@ -17,8 +17,8 @@ public class Account {
     }
 
     // Construtor simplificado (campos obrigatórios)
-    public Account(Person person, AccountType accountType) {
-        setPerson(person);
+    public Account(Client client, AccountType accountType) {
+        setPerson(client);
         setAccountType(accountType);
         this.balance = BigDecimal.ZERO;
         this.status = AccountStatus.ACTIVE;
@@ -26,9 +26,9 @@ public class Account {
     }
 
     // Construtor completo
-    public Account(int id, Person person, AccountType accountType, BigDecimal balance, AccountStatus status, LocalDateTime creationDate) {
+    public Account(int id, Client client, AccountType accountType, BigDecimal balance, AccountStatus status, LocalDateTime creationDate) {
         this.id = id;
-        setPerson(person);
+        setPerson(client);
         setAccountType(accountType);
         setBalance(balance);
         setStatus(status);
@@ -43,15 +43,15 @@ public class Account {
         this.id = id;
     }
 
-    public Person getPerson() {
-        return person;
+    public Client getPerson() {
+        return client;
     }
 
-    public void setPerson(Person person) {
-        if (person == null) {
+    public void setPerson(Client client) {
+        if (client == null) {
             throw new IllegalArgumentException("Person cannot be null");
         }
-        this.person = person;
+        this.client = client;
     }
 
     public AccountType getAccountType() {
@@ -133,7 +133,7 @@ public class Account {
 
         // Exibir mensagem de transferência com nome e CPF
         System.out.println("Successfully transferred: " + transferAmount +
-                "\nFrom: " + this.person.getName() + " (CPF: " + this.person.getCpf() + ")" +
+                "\nFrom: " + this.client.getName() + " (CPF: " + this.client.getCpf() + ")" +
                 "\nTo: " + destinationAccount.getPerson().getName() + " (CPF: " + destinationAccount.getPerson().getCpf() + ")");
     }
 
@@ -141,7 +141,7 @@ public class Account {
     public String toString() {
         return "Account{" +
                 "id=" + id +
-                ", personName=" + person.getName() +
+                ", personName=" + client.getName() +
                 ", accountType='" + accountType + '\'' +
                 ", balance=" + balance +
                 ", status='" + status + '\'' +

@@ -1,18 +1,20 @@
 package br.com.compass.model;
 
-public class Person {
+import java.time.LocalDate;
+
+public class Client {
 
     private String name;
-    private String birthDate;
+    private LocalDate birthDate;
     private String cpf;
     private String phone;
     private String email;
     private String address;
 
-    public Person() {
+    public Client() {
     }
 
-    public Person(String name, String birthDate, String cpf, String phone, String email, String address) {
+    public Client(String name, LocalDate birthDate, String cpf, String phone, String email, String address) {
         this.name = name;
         this.birthDate = birthDate;
         this.cpf = cpf;
@@ -29,11 +31,11 @@ public class Person {
         this.name = name;
     }
 
-    public String getBirthDate() {
+    public LocalDate getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(String birthDate) {
+    public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
     }
 
