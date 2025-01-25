@@ -3,6 +3,7 @@ package br.com.compass;
 import br.com.compass.model.Account;
 import br.com.compass.model.AccountType;
 import br.com.compass.model.Client;
+import br.com.compass.service.ClientService;
 
 import java.time.LocalDate;
 import java.util.Scanner;
@@ -31,6 +32,7 @@ public class App {
             System.out.print("Choose an option: ");
 
             int option = scanner.nextInt();
+            scanner.nextLine(); // Consome a nova linha pendente após nextInt()
 
             switch (option) {
                 case 1:
@@ -97,13 +99,15 @@ public class App {
         }
     }
 
+    // Menu de abertura de conta
     public static void accountOpeningMenu(Scanner scanner) {
-        System.out.println("========= Account Opening =========");
+        ClientService clientService = new ClientService();
 
         try {
+            System.out.println("========= Account Opening =========");
+
             // Solicitação dos dados do cliente
             System.out.print("Enter your full name: ");
-            scanner.nextLine(); // Consome quebra de linha pendente
             String fullName = scanner.nextLine();
 
             System.out.print("Enter your birth date (yyyy-MM-dd): ");
@@ -118,39 +122,15 @@ public class App {
             System.out.print("Enter your email: ");
             String email = scanner.nextLine();
 
-            System.out.print("Enter your password (must contains at least 8 characters and at least an upper letter): ");
+            System.out.print("Enter your password (must contain at least 8 characters and an uppercase letter): ");
             String password = scanner.nextLine();
 
-            // Solicitação do endereço
-            System.out.println("Address");
-            System.out.print("Enter your street name: ");
-            String streetName = scanner.nextLine();
+            // Criar e validar cliente
+            Client client = new Client(fullName, birthDate, cpf, phoneNumber, email, password);
+            clientService.validateClient(client);
 
-            System.out.print("Enter your street number: ");
-            int streetNumber = scanner.nextInt();
-            scanner.nextLine(); // Consome quebra de linha pendente
-
-            System.out.print("Enter your neighborhood: ");
-            String neighborhood = scanner.nextLine();
-
-            System.out.print("Enter your postal code (DDDDD-DDD): ");
-            String postalCode = scanner.nextLine();
-
-            System.out.print("Enter your city: ");
-            String city = scanner.nextLine();
-
-            System.out.print("Enter your state: ");
-            String state = scanner.nextLine();
-
-            System.out.print("Enter your country: ");
-            String country = scanner.nextLine();
-
-            // Criar o cliente com os novos atributos
-            Client client = new Client(fullName, birthDate, cpf, phoneNumber, email, password,
-                    streetName, streetNumber, neighborhood, postalCode, city, state, country);
-
-            // Solicitar o tipo de conta
-            System.out.println("Available account types: ");
+            // Selecionar tipo de conta
+            System.out.println("Available account types:");
             for (int i = 0; i < AccountType.values().length; i++) {
                 System.out.println((i + 1) + ". " + AccountType.values()[i]);
             }
@@ -164,12 +144,9 @@ public class App {
             }
 
             AccountType selectedAccountType = AccountType.values()[typeOption - 1];
-            System.out.println("You selected: " + selectedAccountType);
-
-            // Criar a conta
             Account account = new Account(client, selectedAccountType);
 
-            // Exibir os dados da conta criada
+            // Exibir dados da conta criada
             System.out.println("\nAccount successfully created!");
             System.out.println(account);
 

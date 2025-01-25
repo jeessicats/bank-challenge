@@ -7,32 +7,32 @@ import java.util.Objects;
 public class Account {
 
     private int id;
-    private Client client; // Relacionamento com Cliente
-    private AccountType accountType; // Enum AccountType
+    private final Client client; // Relacionamento com Cliente
+    private final AccountType accountType; // Enum AccountType
     private BigDecimal balance; // BigDecimal para trabalhar com dinheiro
-    private AccountStatus status; // Enum AccountStatus
-    private LocalDateTime creationDate;
-
-    // Construtor padrão
-    public Account() {
-    }
+    private final LocalDateTime creationDate;
 
     // Construtor com campos obrigatórios
     public Account(Client client, AccountType accountType) {
-        setClient(client);
-        setAccountType(accountType);
+        if (client == null) throw new IllegalArgumentException("Client cannot be null");
+        if (accountType == null) throw new IllegalArgumentException("Account type cannot be null");
+
+        this.client = client;
+        this.accountType = accountType;
         this.balance = BigDecimal.ZERO;
-        this.status = AccountStatus.ACTIVE;
         this.creationDate = LocalDateTime.now();
     }
 
     // Construtor completo
-    public Account(int id, Client client, AccountType accountType, BigDecimal balance, AccountStatus status, LocalDateTime creationDate) {
+    public Account(int id, Client client, AccountType accountType, BigDecimal balance, LocalDateTime creationDate) {
+        if (client == null) throw new IllegalArgumentException("Client cannot be null");
+        if (accountType == null) throw new IllegalArgumentException("Account type cannot be null");
+        if (balance == null || balance.compareTo(BigDecimal.ZERO) < 0) throw new IllegalArgumentException("Balance cannot be null or negative");
+
         this.id = id;
-        setClient(client);
-        setAccountType(accountType);
-        setBalance(balance);
-        setStatus(status);
+        this.client = client;
+        this.accountType = accountType;
+        this.balance = balance;
         this.creationDate = creationDate != null ? creationDate : LocalDateTime.now();
     }
 
@@ -40,72 +40,20 @@ public class Account {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public Client getClient() {
         return client;
-    }
-
-    public void setClient(Client client) {
-        if (client == null) {
-            throw new IllegalArgumentException("Client cannot be null");
-        }
-        this.client = client;
     }
 
     public AccountType getAccountType() {
         return accountType;
     }
 
-    public void setAccountType(AccountType accountType) {
-        if (accountType == null) {
-            throw new IllegalArgumentException("Account type cannot be null");
-        }
-        this.accountType = accountType;
-    }
-
     public BigDecimal getBalance() {
         return balance;
     }
 
-    public void setBalance(BigDecimal balance) {
-        if (balance.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Balance cannot be negative");
-        }
-        this.balance = balance;
-    }
-
-    public AccountStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(AccountStatus status) {
-        if (status == null) {
-            throw new IllegalArgumentException("Account status cannot be null");
-        }
-        this.status = status;
-    }
-
     public LocalDateTime getCreationDate() {
         return creationDate;
-    }
-
-    public void setCreationDate(LocalDateTime creationDate) {
-        this.creationDate = creationDate;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Account account = (Account) o;
-        return getId() == account.getId();
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(getId());
     }
 
     public void deposit(BigDecimal amount) {
@@ -113,17 +61,16 @@ public class Account {
             throw new IllegalArgumentException("Deposit amount must be greater than zero");
         }
         this.balance = this.balance.add(amount);
-        System.out.println("Successfully deposited: " + amount);
     }
 
     public void withdrawal(BigDecimal amount) {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Withdrawal amount must be greater than zero");
-        } else if (this.balance.subtract(amount).compareTo(BigDecimal.ZERO) < 0) {
+        }
+        if (this.balance.subtract(amount).compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Insufficient balance for withdrawal");
         }
         this.balance = this.balance.subtract(amount);
-        System.out.println("Successfully withdrawn: " + amount);
     }
 
     public void transfer(Account destinationAccount, BigDecimal transferAmount) {
@@ -141,13 +88,21 @@ public class Account {
         }
 
         // Realizar a transferência
-        this.withdrawal(transferAmount); // Saque da conta de origem
-        destinationAccount.deposit(transferAmount); // Depósito na conta de destino
+        this.withdrawal(transferAmount);
+        destinationAccount.deposit(transferAmount);
+    }
 
-        // Exibir mensagem de transferência com nome completo e CPF
-        System.out.println("Successfully transferred: " + transferAmount +
-                "\nFrom: " + this.client.getFullName() + " (CPF: " + this.client.getCpf() + ")" +
-                "\nTo: " + destinationAccount.getClient().getFullName() + " (CPF: " + destinationAccount.getClient().getCpf() + ")");
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Account account = (Account) o;
+        return id == account.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override
@@ -155,9 +110,8 @@ public class Account {
         return "Account{" +
                 "id=" + id +
                 ", clientName=" + client.getFullName() +
-                ", accountType='" + accountType + '\'' +
+                ", accountType=" + accountType +
                 ", balance=" + balance +
-                ", status='" + status + '\'' +
                 ", creationDate=" + creationDate +
                 '}';
     }

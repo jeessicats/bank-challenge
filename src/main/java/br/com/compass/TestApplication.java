@@ -23,14 +23,7 @@ public class TestApplication {
                 "12345678901",
                 "5551234567",
                 "olivia.willow@example.com",
-                "Password123", // Adicionado o campo senha
-                "Main St",
-                123,
-                "Downtown",
-                "12345-678",
-                "Springfield",
-                "IL",
-                "USA"
+                "Password123"
         );
 
         System.out.println("Testing Client class:");
@@ -56,7 +49,6 @@ public class TestApplication {
         performWithdrawal(account, new BigDecimal("50.00")); // Saque válido
         performWithdrawal(account, new BigDecimal("200.00")); // Saldo insuficiente
         performWithdrawal(account, BigDecimal.ZERO); // Valor inválido
-
     }
 
     private static void performDeposit(Account account, BigDecimal amount) {
@@ -64,7 +56,7 @@ public class TestApplication {
             account.deposit(amount);
             System.out.println("Balance after deposit: " + account.getBalance());
         } catch (IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println("Error during deposit: " + e.getMessage());
         }
     }
 
@@ -73,7 +65,7 @@ public class TestApplication {
             account.withdrawal(amount);
             System.out.println("Balance after withdrawal: " + account.getBalance());
         } catch (IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println("Error during withdrawal: " + e.getMessage());
         }
     }
 }
