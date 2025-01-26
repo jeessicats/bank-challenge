@@ -1,18 +1,16 @@
 package br.com.compass.repository;
 
-import br.com.compass.model.Client;
 import br.com.compass.config.DatabaseConnection;
+import br.com.compass.model.Client;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 
 public class ClientRepository {
 
     public boolean save(Client client) {
         String sql = "INSERT INTO clients (full_name, birth_date, cpf, phone_number, email, client_password) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             statement.setString(1, client.getFullName());
             statement.setDate(2, java.sql.Date.valueOf(client.getBirthDate()));
@@ -21,8 +19,19 @@ public class ClientRepository {
             statement.setString(5, client.getEmail());
             statement.setString(6, client.getPassword());
 
-            return statement.executeUpdate() > 0;
-        } catch (Exception e) {
+            int rowsInserted = statement.executeUpdate();
+
+            // Recuperar o ID gerado e configurar no objeto Client
+            if (rowsInserted > 0) {
+                try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        client.setIdClient(generatedKeys.getInt(1)); // Define o ID no objeto Client
+                    }
+                }
+            }
+
+            return rowsInserted > 0;
+        } catch (SQLException e) {
             System.err.println("Error saving client: " + e.getMessage());
             return false;
         }

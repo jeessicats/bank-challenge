@@ -11,6 +11,10 @@ public class Client {
     private String email;
     private String password;
 
+    public Client(Integer idClient) {
+        this.idClient = idClient;
+    }
+
     // Construtor completo sem o id
     public Client(String fullName, LocalDate birthDate, String cpf, String phoneNumber, String email, String password) {
         this.fullName = fullName;
