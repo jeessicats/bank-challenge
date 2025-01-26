@@ -14,7 +14,9 @@ public class TestApplication {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         // Limpar a tabela antes de começar os testes
-        DatabaseUtil.clearAccountsTable();
+        System.out.println("Clearing all tables before tests...");
+        DatabaseUtil.clearAllTables();
+        System.out.println("All tables cleared. Ready for testing!");
 
         // Teste da classe Client
         Client oliviaWillow = new Client(

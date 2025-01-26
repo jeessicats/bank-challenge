@@ -6,7 +6,7 @@ import java.util.Objects;
 
 public class Account {
 
-    private int id;
+    private int idAccount; // idAccount
     private final Client client; // Relacionamento com Cliente
     private final AccountType accountType; // Enum AccountType
     private BigDecimal balance; // BigDecimal para trabalhar com dinheiro
@@ -14,30 +14,28 @@ public class Account {
 
     // Construtor com campos obrigatórios
     public Account(Client client, AccountType accountType) {
-        if (client == null) throw new IllegalArgumentException("Client cannot be null");
-        if (accountType == null) throw new IllegalArgumentException("Account type cannot be null");
-
         this.client = client;
         this.accountType = accountType;
-        this.balance = BigDecimal.ZERO;
-        this.creationDate = LocalDateTime.now();
+        this.balance = BigDecimal.ZERO; // Saldo inicial padrão
+        this.creationDate = LocalDateTime.now(); // Data de criação padrão
     }
 
     // Construtor completo
-    public Account(int id, Client client, AccountType accountType, BigDecimal balance, LocalDateTime creationDate) {
-        if (client == null) throw new IllegalArgumentException("Client cannot be null");
-        if (accountType == null) throw new IllegalArgumentException("Account type cannot be null");
-        if (balance == null || balance.compareTo(BigDecimal.ZERO) < 0) throw new IllegalArgumentException("Balance cannot be null or negative");
-
-        this.id = id;
+    public Account(int idAccount, Client client, AccountType accountType, BigDecimal balance, LocalDateTime creationDate) {
+        this.idAccount = idAccount;
         this.client = client;
         this.accountType = accountType;
         this.balance = balance;
-        this.creationDate = creationDate != null ? creationDate : LocalDateTime.now();
+        this.creationDate = creationDate;
     }
 
-    public int getId() {
-        return id;
+    // Getters e setters
+    public int getIdAccount() {
+        return idAccount;
+    }
+
+    public void setIdAccount(int idAccount) {
+        this.idAccount = idAccount;
     }
 
     public Client getClient() {
@@ -56,6 +54,7 @@ public class Account {
         return creationDate;
     }
 
+    // Métodos de operação
     public void deposit(BigDecimal amount) {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Deposit amount must be greater than zero");
@@ -92,23 +91,24 @@ public class Account {
         destinationAccount.deposit(transferAmount);
     }
 
+    // Métodos de comparação e representação
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Account account = (Account) o;
-        return id == account.id;
+        return idAccount == account.idAccount; // Comparação com idAccount
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(idAccount); // Hash baseado em idAccount
     }
 
     @Override
     public String toString() {
         return "Account{" +
-                "id=" + id +
+                "idAccount=" + idAccount +
                 ", clientName=" + client.getFullName() +
                 ", accountType=" + accountType +
                 ", balance=" + balance +

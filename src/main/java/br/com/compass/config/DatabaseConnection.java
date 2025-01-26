@@ -11,13 +11,20 @@ public class DatabaseConnection {
 
     public static Connection getConnection() throws SQLException {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
+            Class.forName("com.mysql.cj.jdbc.Driver"); // Garante o registro do driver
         } catch (ClassNotFoundException e) {
-            System.out.println("JDBC Driver not found.");
-            e.printStackTrace();
+            throw new SQLException("MySQL Driver not found. Include it in your library path!", e);
         }
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
+
+    public static void testConnection() {
+        try (Connection connection = getConnection()) {
+            if (connection != null) {
+                System.out.println("Database connected successfully!");
+            }
+        } catch (SQLException e) {
+            System.err.println("Failed to connect to the database: " + e.getMessage());
+        }
+    }
 }
-
-

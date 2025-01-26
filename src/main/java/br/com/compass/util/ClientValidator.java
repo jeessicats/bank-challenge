@@ -6,13 +6,13 @@ import java.util.regex.Pattern;
 public class ClientValidator {
 
     private static final Pattern CPF_PATTERN = Pattern.compile(
-            "(\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2})|(\\d{11})", Pattern.COMMENTS
+            "(\\d{11})", Pattern.COMMENTS
     );
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
 
     // Regex para validação de números de telefone
-    private static final Pattern PHONE_PATTERN = Pattern.compile("^\\(?\\d{2}\\)?[ ]?\\d{4,5}[- ]?\\d{4}$");
+    private static final Pattern PHONE_PATTERN = Pattern.compile("(\\d{10,11})");
 
     // Verifica se a data não é nula
     public static boolean isValidDate(LocalDate date) {

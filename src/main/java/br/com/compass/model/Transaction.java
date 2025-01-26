@@ -4,19 +4,15 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class Transaction {
-    private int transactionId; // ID da transação
+    private int idTransaction; // idTransaction
     private int sourceAccountId; // ID da conta de origem
     private Integer destinationAccountId; // Conta de destino (somente para transferências, pode ser null)
     private TransactionType type; // Tipo da transação (DEPOSIT, WITHDRAWAL, TRANSFER)
     private BigDecimal amount; // Valor da transação
     private LocalDateTime timestamp; // Data e hora da transação
 
-    public Transaction() {
-    }
-
-    // Construtor completo
-    public Transaction(int transactionId, int sourceAccountId, Integer destinationAccountId, TransactionType type, BigDecimal amount, LocalDateTime timestamp) {
-        this.transactionId = transactionId;
+    // Construtor sem id
+    public Transaction(int sourceAccountId, Integer destinationAccountId, TransactionType type, BigDecimal amount, LocalDateTime timestamp) {
         this.sourceAccountId = sourceAccountId;
         this.destinationAccountId = destinationAccountId;
         this.type = type;
@@ -24,12 +20,23 @@ public class Transaction {
         this.timestamp = timestamp;
     }
 
-    public int getTransactionId() {
-        return transactionId;
+    // Construtor completo
+    public Transaction(int idTransaction, int sourceAccountId, Integer destinationAccountId, TransactionType type, BigDecimal amount, LocalDateTime timestamp) {
+        this.idTransaction = idTransaction;
+        this.sourceAccountId = sourceAccountId;
+        this.destinationAccountId = destinationAccountId;
+        this.type = type;
+        this.amount = amount;
+        this.timestamp = timestamp;
     }
 
-    public void setTransactionId(int transactionId) {
-        this.transactionId = transactionId;
+    // Getters e setters
+    public int getIdTransaction() {
+        return idTransaction;
+    }
+
+    public void setIdTransaction(int idTransaction) {
+        this.idTransaction = idTransaction;
     }
 
     public int getSourceAccountId() {
@@ -75,7 +82,7 @@ public class Transaction {
     @Override
     public String toString() {
         return "Transaction{" +
-                "transactionId=" + transactionId +
+                "idTransaction=" + idTransaction +
                 ", sourceAccountId=" + sourceAccountId +
                 ", destinationAccountId=" + destinationAccountId +
                 ", type=" + type +

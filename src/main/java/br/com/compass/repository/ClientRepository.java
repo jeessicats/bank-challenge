@@ -9,7 +9,6 @@ import java.sql.ResultSet;
 
 public class ClientRepository {
 
-    // Salva o cliente no banco de dados
     public boolean save(Client client) {
         String sql = "INSERT INTO clients (full_name, birth_date, cpf, phone_number, email, password) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection connection = DatabaseConnection.getConnection();
@@ -24,12 +23,11 @@ public class ClientRepository {
 
             return statement.executeUpdate() > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Error saving client: " + e.getMessage());
             return false;
         }
     }
 
-    // Busca um cliente pelo CPF
     public Client findByCpf(String cpf) {
         String sql = "SELECT * FROM clients WHERE cpf = ?";
         try (Connection connection = DatabaseConnection.getConnection();
@@ -49,9 +47,8 @@ public class ClientRepository {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Error finding client by CPF: " + e.getMessage());
         }
         return null;
     }
 }
-

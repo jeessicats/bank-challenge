@@ -3,6 +3,7 @@ package br.com.compass.model;
 import java.time.LocalDate;
 
 public class Client {
+    private Integer idClient;
     private String fullName;
     private LocalDate birthDate;
     private String cpf;
@@ -10,10 +11,7 @@ public class Client {
     private String email;
     private String password;
 
-    // Construtor vazio
-    public Client() {}
-
-    // Construtor completo
+    // Construtor completo sem o id
     public Client(String fullName, LocalDate birthDate, String cpf, String phoneNumber, String email, String password) {
         this.fullName = fullName;
         this.birthDate = birthDate;
@@ -23,7 +21,26 @@ public class Client {
         this.password = password;
     }
 
+    // Construtor completo com o id
+    public Client(Integer idClient, String fullName, LocalDate birthDate, String cpf, String phoneNumber, String email, String password) {
+        this.idClient = idClient;
+        this.fullName = fullName;
+        this.birthDate = birthDate;
+        this.cpf = cpf;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        this.password = password;
+    }
+
     // Getters e setters
+    public Integer getIdClient() {
+        return idClient;
+    }
+
+    public void setIdClient(Integer idClient) {
+        this.idClient = idClient;
+    }
+
     public String getFullName() {
         return fullName;
     }

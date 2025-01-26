@@ -1,5 +1,6 @@
 package br.com.compass;
 
+import br.com.compass.config.DatabaseConnection;
 import br.com.compass.model.Account;
 import br.com.compass.model.AccountType;
 import br.com.compass.model.Client;
@@ -11,6 +12,10 @@ import java.util.Scanner;
 public class App {
 
     public static void main(String[] args) {
+
+        // Teste de conexão com o banco de dados
+        System.out.println("Testing database connection...");
+        DatabaseConnection.testConnection();
 
         Scanner scanner = new Scanner(System.in);
 
