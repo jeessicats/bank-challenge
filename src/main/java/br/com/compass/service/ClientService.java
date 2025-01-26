@@ -3,7 +3,7 @@ package br.com.compass.service;
 import br.com.compass.exception.ValidationException;
 import br.com.compass.model.Client;
 import br.com.compass.repository.ClientRepository;
-import br.com.compass.util.Validator;
+import br.com.compass.util.ClientValidator;
 
 public class ClientService {
 
@@ -14,47 +14,57 @@ public class ClientService {
         this.clientRepository = new ClientRepository();
     }
 
-    // Valida os dados do cliente antes de qualquer operação
     public void validateClient(Client client) {
-        if (client.getFullName() == null || client.getFullName().isEmpty()) {
+        // Verifica se o objeto client é nulo
+        if (client == null) {
+            throw new ValidationException("Client cannot be null.");
+        }
+
+        // Nome completo
+        if (!ClientValidator.isNotNullOrEmpty(client.getFullName())) {
             throw new ValidationException("Full name cannot be null or empty.");
         }
-        if (client.getBirthDate() == null) {
+
+        // Data de nascimento
+        if (!ClientValidator.isValidDate(client.getBirthDate())) {
             throw new ValidationException("Birth date cannot be null.");
         }
-        if (!Validator.isValidCpf(client.getCpf())) {
+
+        if (!ClientValidator.isNotInFuture(client.getBirthDate())) {
+            throw new ValidationException("Birth date cannot be in the future.");
+        }
+
+        if (!ClientValidator.isAtLeastAge(client.getBirthDate(), 18)) {
+            throw new ValidationException("Client must be at least 18 years old.");
+        }
+
+        // CPF
+        if (!ClientValidator.isNotNullOrEmpty(client.getCpf())) {
+            throw new ValidationException("CPF cannot be null or empty.");
+        }
+        if (!ClientValidator.isValidCpf(client.getCpf())) {
             throw new ValidationException("Invalid CPF format.");
         }
-        if (!Validator.isValidEmail(client.getEmail())) {
+
+        // Phone Number
+        if (!ClientValidator.isNotNullOrEmpty(client.getPhoneNumber())) {
+            throw new ValidationException("Phone number cannot be null or empty.");
+        }
+
+        // Email
+        if (!ClientValidator.isNotNullOrEmpty(client.getEmail())) {
+            throw new ValidationException("Email cannot be null or empty.");
+        }
+        if (!ClientValidator.isValidEmail(client.getEmail())) {
             throw new ValidationException("Invalid email format.");
         }
-        if (!Validator.isValidPassword(client.getPassword())) {
+
+        // Senha
+        if (!ClientValidator.isNotNullOrEmpty(client.getPassword())) {
+            throw new ValidationException("Password cannot be null or empty.");
+        }
+        if (!ClientValidator.isValidPassword(client.getPassword())) {
             throw new ValidationException("Password does not meet the required criteria.");
         }
-    }
-
-    // Registra o cliente no sistema
-    public void registerClient(Client client) {
-        validateClient(client); // Valida os dados do cliente
-        boolean success = clientRepository.save(client); // Persiste o cliente no banco de dados
-
-        if (!success) {
-            throw new RuntimeException("Failed to register client in the database.");
-        }
-
-        System.out.println("Client successfully registered!");
-    }
-
-    // Busca cliente por CPF
-    public Client findClientByCpf(String cpf) {
-        if (!Validator.isValidCpf(cpf)) {
-            throw new ValidationException("Invalid CPF format.");
-        }
-
-        Client client = clientRepository.findByCpf(cpf);
-        if (client == null) {
-            throw new RuntimeException("Client not found.");
-        }
-        return client;
     }
 }
