@@ -46,12 +46,13 @@ public class ClientRepository {
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     return new Client(
+                            resultSet.getInt("id_client"),
                             resultSet.getString("full_name"),
                             resultSet.getDate("birth_date").toLocalDate(),
                             resultSet.getString("cpf"),
                             resultSet.getString("phone_number"),
                             resultSet.getString("email"),
-                            resultSet.getString("client_password") // Corrigir aqui!
+                            resultSet.getString("client_password")
                     );
                 }
             }

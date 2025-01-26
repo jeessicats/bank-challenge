@@ -12,7 +12,7 @@ import java.util.List;
 
 public class AccountRepository {
 
-    // Método para salvar uma nova conta no banco de dados
+    // Salvar uma nova conta no banco de dados
     public boolean save(Account account) {
         String sql = "INSERT INTO accounts (id_client, account_type, balance, creation_date) VALUES (?, ?, ?, ?)";
         try (Connection connection = DatabaseConnection.getConnection();
@@ -42,31 +42,7 @@ public class AccountRepository {
         }
     }
 
-    // Método para buscar uma conta pelo ID
-    public Account findById(int idAccount) {
-        String sql = "SELECT * FROM accounts WHERE id_account = ?";
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-
-            statement.setInt(1, idAccount);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    return new Account(
-                            resultSet.getInt("id_account"),
-                            new Client(resultSet.getInt("id_client")), // Apenas o ID do cliente
-                            AccountType.valueOf(resultSet.getString("account_type")),
-                            resultSet.getBigDecimal("balance"),
-                            resultSet.getTimestamp("creation_date").toLocalDateTime()
-                    );
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Error finding account by ID: " + e.getMessage());
-        }
-        return null;
-    }
-
-    // Método para buscar todas as contas de um cliente pelo CPF
+    // Buscar contas pelo CPF
     public List<Account> findByCpf(String cpf) {
         String sql = "SELECT a.id_account, a.id_client, a.account_type, a.balance, a.creation_date " +
                 "FROM accounts a " +
@@ -94,7 +70,7 @@ public class AccountRepository {
         return accounts;
     }
 
-    // Método para atualizar o saldo de uma conta
+    // Atualizar o saldo de uma conta
     public boolean updateBalance(int idAccount, BigDecimal newBalance) {
         String sql = "UPDATE accounts SET balance = ? WHERE id_account = ?";
         try (Connection connection = DatabaseConnection.getConnection();
