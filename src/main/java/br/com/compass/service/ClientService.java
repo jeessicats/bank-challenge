@@ -72,7 +72,7 @@ public class ClientService {
 
     public String captureValidPhoneNumber(Scanner scanner) {
         while (true) {
-            System.out.print("Enter your phone number: ");
+            System.out.print("Enter your phone number with the local code (DDD): ");
             String phoneNumber = scanner.nextLine();
             if (ClientValidator.isValidPhoneNumber(phoneNumber)) {
                 return phoneNumber;
@@ -94,7 +94,7 @@ public class ClientService {
 
     public String captureValidPassword(Scanner scanner) {
         while (true) {
-            System.out.print("Enter your password (at least 8 characters and 1 uppercase letter): ");
+            System.out.print("Enter your password (at least 8 characters, including 1 uppercase letter and 1 number): ");
             String password = scanner.nextLine();
             if (ClientValidator.isValidPassword(password)) {
                 return password;

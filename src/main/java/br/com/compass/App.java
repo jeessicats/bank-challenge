@@ -106,28 +106,16 @@ public class App {
         try {
             System.out.println("========= Account Opening =========");
 
-            // Solicitação dos dados do cliente
-            System.out.print("Enter your full name: ");
-            String fullName = scanner.nextLine();
+            // Pede os dados do cliente usando os métodos da classe da ClientService
+            String fullName = clientService.captureValidFullName(scanner);
+            LocalDate birthDate = clientService.captureValidBirthDate(scanner);
+            String cpf = clientService.captureValidCpf(scanner);
+            String phoneNumber = clientService.captureValidPhoneNumber(scanner);
+            String email = clientService.captureValidEmail(scanner);
+            String password = clientService.captureValidPassword(scanner);
 
-            System.out.print("Enter your birth date (yyyy-MM-dd): ");
-            LocalDate birthDate = LocalDate.parse(scanner.nextLine());
-
-            System.out.print("Enter your CPF (11 digits): ");
-            String cpf = scanner.nextLine();
-
-            System.out.print("Enter your phone number: ");
-            String phoneNumber = scanner.nextLine();
-
-            System.out.print("Enter your email: ");
-            String email = scanner.nextLine();
-
-            System.out.print("Enter your password (must contain at least 8 characters and an uppercase letter): ");
-            String password = scanner.nextLine();
-
-            // Criar e validar cliente
+            // Criar o objeto Cliente com os dados validados
             Client client = new Client(fullName, birthDate, cpf, phoneNumber, email, password);
-            clientService.validateClient(client);
 
             // Selecionar tipo de conta
             System.out.println("Available account types:");
@@ -150,10 +138,8 @@ public class App {
             System.out.println("\nAccount successfully created!");
             System.out.println(account);
 
-        } catch (IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());
         } catch (Exception e) {
-            System.out.println("An unexpected error occurred. Please try again.");
+            System.out.println("An unexpected error occurred: " + e.getMessage());
         }
     }
 }
