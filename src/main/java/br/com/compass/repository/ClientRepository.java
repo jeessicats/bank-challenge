@@ -10,7 +10,7 @@ import java.sql.ResultSet;
 public class ClientRepository {
 
     public boolean save(Client client) {
-        String sql = "INSERT INTO clients (full_name, birth_date, cpf, phone_number, email, password) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO clients (full_name, birth_date, cpf, phone_number, email, client_password) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
@@ -42,7 +42,7 @@ public class ClientRepository {
                             resultSet.getString("cpf"),
                             resultSet.getString("phone_number"),
                             resultSet.getString("email"),
-                            resultSet.getString("password")
+                            resultSet.getString("client_password") // Corrigir aqui!
                     );
                 }
             }
