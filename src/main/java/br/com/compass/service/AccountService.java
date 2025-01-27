@@ -1,36 +1,40 @@
 package br.com.compass.service;
 
-import br.com.compass.config.DatabaseConnection;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import br.com.compass.model.Account;
+import br.com.compass.model.AccountType;
+import br.com.compass.model.Client;
+import br.com.compass.repository.AccountRepository;
 
 public class AccountService {
 
-    public void openAccount(String name, String birthDate, String cpf, String phone, String email, String address, String accountType) {
-        String sql = "INSERT INTO accounts (name, birth_date, cpf, phone, email, address, account_type) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    private final AccountRepository accountRepository;
 
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+    // Injeção do repositório no serviço
+    public AccountService(AccountRepository accountRepository) {
+        this.accountRepository = accountRepository;
+    }
 
-            statement.setString(1, name);
-            statement.setString(2, birthDate);
-            statement.setString(3, cpf);
-            statement.setString(4, phone);
-            statement.setString(5, email);
-            statement.setString(6, address);
-            statement.setString(7, accountType);
-
-            int rowsAffected = statement.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("Account created successfully!");
-            } else {
-                System.out.println("Failed to create account.");
+    public boolean openAccount(Client client, String accountType) {
+        try {
+            // Validações
+            if (client == null) {
+                throw new IllegalArgumentException("Client cannot be null");
             }
-        } catch (SQLException e) {
-            System.out.println("Error while creating account: " + e.getMessage());
-            e.printStackTrace();
+            if (accountType == null || accountType.isEmpty()) {
+                throw new IllegalArgumentException("Account type cannot be null or empty");
+            }
+
+            // Criar a conta
+            Account account = new Account(client, AccountType.valueOf(accountType.toUpperCase()));
+
+            // Persistir a conta no banco de dados
+            return accountRepository.save(account);
+        } catch (IllegalArgumentException e) {
+            System.err.println("Invalid data provided: " + e.getMessage());
+            return false;
+        } catch (Exception e) {
+            System.err.println("Error while opening account: " + e.getMessage());
+            return false;
         }
     }
 }
