@@ -17,7 +17,6 @@ public class DatabaseConnection {
             throw new SQLException("MySQL Driver not found. Include it in your library path!", e);
         }
         Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
-        System.out.println("Connection established with database: " + URL);
         return connection;
     }
 

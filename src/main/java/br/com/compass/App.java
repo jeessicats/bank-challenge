@@ -67,7 +67,6 @@ public class App {
                     loginMenu(scanner, accountRepository, accountService);
                     return;
                 case 2:
-                    // ToDo...
                     accountOpeningMenu(scanner, accountRepository);
                     break;
                 case 0:
@@ -81,60 +80,50 @@ public class App {
 
     // Menu login
     public static void loginMenu(Scanner scanner, AccountRepository accountRepository, AccountService accountService) {
-        boolean running = true;
+        System.out.println("========= Login Menu =========");
 
-        while (running) {
-            System.out.println("========= Login Menu =========");
-            System.out.println("|| 1. Enter CPF and Password ||");
-            System.out.println("|| 0. Back to Main Menu      ||");
-            System.out.println("=============================");
-            System.out.print("Choose an option: ");
+        boolean loginSuccessful = false;
 
-            int option = scanner.nextInt();
-            scanner.nextLine(); // Consome a nova linha pendente após nextInt()
+        while (!loginSuccessful) {
+            // Valida o CPF usando o método do ClientValidator
+            System.out.print("Enter your CPF: ");
+            String cpf = scanner.nextLine();
 
-            switch (option) {
-                case 1:
-                    System.out.print("Enter your CPF: ");
-                    String cpf = scanner.nextLine(); // Altere para nextLine() para ler o CPF como string
+            if (!ClientValidator.isValidCpf(cpf)) {
+                System.out.println("Invalid CPF format. Please try again.");
+                continue; // Retorna ao início do loop para tentar novamente
+            }
 
-                    System.out.print("Enter your password: ");
-                    String password = scanner.nextLine();
+            try {
+                // Busca o cliente associado ao CPF
+                Client client = accountRepository.findClientFromAccountByCpf(cpf);
 
-                    try {
-                        // Chama o método correto que retorna o cliente associado ao CPF
-                        Client client = accountRepository.findClientFromAccountByCpf(cpf);
+                if (client == null) {
+                    System.out.println("No account found for CPF: " + cpf);
+                    continue; // Retorna ao início do loop para tentar novamente
+                }
 
-                        if (client == null) {
-                            System.out.println("No account found for CPF: " + cpf);
-                            return; // Retorna ao menu principal caso não encontre a conta
-                        }
+                // CPF válido e cliente encontrado, solicita a senha
+                System.out.print("Enter your password: ");
+                String password = scanner.nextLine();
 
-                        // Valida a senha
-                        if (client.getPassword().equals(password)) {
-                            loggedClient = client; // Define o cliente logado
-                            System.out.println("Login successful! Welcome, " + client.getFullName() + "!");
-                            bankMenu(scanner, accountRepository, accountService); // Redireciona para o menu bancário
-                            return; // Sai do menu de login
-                        } else {
-                            System.out.println("Invalid CPF or password. Please try again.");
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();  // Mostra o rastreamento de pilha completo para depuração
-                        System.err.println("Error during login: " + e.getMessage());
-                    }
-                    break;
+                // Valida a senha
+                if (client.getPassword().equals(password)) {
+                    loggedClient = client; // Define o cliente logado
+                    System.out.println("Login successful! Welcome, " + client.getFullName() + "!");
+                    bankMenu(scanner, accountRepository, accountService); // Redireciona para o menu bancário
+                    loginSuccessful = true; // Finaliza o loop após login bem-sucedido
+                } else {
+                    System.out.println("Invalid password. Please try again.");
+                }
 
-                case 0:
-                    System.out.println("Returning to Main Menu...");
-                    running = false; // Sai do menu de login e volta ao menu principal
-                    break;
-
-                default:
-                    System.out.println("Invalid option! Please try again.");
+            } catch (Exception e) {
+                e.printStackTrace(); // Mostra o rastreamento de pilha completo para depuração
+                System.err.println("Error during login: " + e.getMessage());
             }
         }
     }
+
 
     public static void bankMenu(Scanner scanner, AccountRepository accountRepository, AccountService accountService) {
         boolean running = true;
