@@ -1,30 +1,44 @@
 package br.com.compass.model;
 
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "transactions")
 public class Transaction {
-    private int idTransaction; // idTransaction
-    private int sourceAccountId; // ID da conta de origem
-    private Integer destinationAccountId; // Conta de destino (somente para transferências, pode ser null)
-    private TransactionType type; // Tipo da transação (DEPOSIT, WITHDRAWAL, TRANSFER)
-    private BigDecimal amount; // Valor da transação
-    private LocalDateTime timestamp; // Data e hora da transação
 
-    // Construtor sem id
-    public Transaction(int sourceAccountId, Integer destinationAccountId, TransactionType type, BigDecimal amount, LocalDateTime timestamp) {
-        this.sourceAccountId = sourceAccountId;
-        this.destinationAccountId = destinationAccountId;
-        this.type = type;
-        this.amount = amount;
-        this.timestamp = timestamp;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Geração automática do ID
+    @Column(name = "id_transaction")
+    private int idTransaction;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false) // Relacionamento com a conta de origem
+    @JoinColumn(name = "source_account_id", nullable = false) // Chave estrangeira
+    private Account sourceAccount;
+
+    @ManyToOne(fetch = FetchType.LAZY) // Relacionamento com a conta de destino (pode ser null)
+    @JoinColumn(name = "destination_account_id")
+    private Account destinationAccount;
+
+    @Enumerated(EnumType.STRING) // Salvar o enum como String no banco de dados
+    @Column(nullable = false)
+    private TransactionType type;
+
+    @Column(nullable = false, scale = 2, precision = 20) // BigDecimal configurado
+    private BigDecimal amount;
+
+    @Column(nullable = false, name = "timestamp")
+    private LocalDateTime timestamp;
+
+    // Construtor vazio (obrigatório para o JPA)
+    public Transaction() {
     }
 
-    // Construtor completo
-    public Transaction(int idTransaction, int sourceAccountId, Integer destinationAccountId, TransactionType type, BigDecimal amount, LocalDateTime timestamp) {
-        this.idTransaction = idTransaction;
-        this.sourceAccountId = sourceAccountId;
-        this.destinationAccountId = destinationAccountId;
+    // Construtor sem ID
+    public Transaction(Account sourceAccount, Account destinationAccount, TransactionType type, BigDecimal amount, LocalDateTime timestamp) {
+        this.sourceAccount = sourceAccount;
+        this.destinationAccount = destinationAccount;
         this.type = type;
         this.amount = amount;
         this.timestamp = timestamp;
@@ -39,20 +53,20 @@ public class Transaction {
         this.idTransaction = idTransaction;
     }
 
-    public int getSourceAccountId() {
-        return sourceAccountId;
+    public Account getSourceAccount() {
+        return sourceAccount;
     }
 
-    public void setSourceAccountId(int sourceAccountId) {
-        this.sourceAccountId = sourceAccountId;
+    public void setSourceAccount(Account sourceAccount) {
+        this.sourceAccount = sourceAccount;
     }
 
-    public Integer getDestinationAccountId() {
-        return destinationAccountId;
+    public Account getDestinationAccount() {
+        return destinationAccount;
     }
 
-    public void setDestinationAccountId(Integer destinationAccountId) {
-        this.destinationAccountId = destinationAccountId;
+    public void setDestinationAccount(Account destinationAccount) {
+        this.destinationAccount = destinationAccount;
     }
 
     public TransactionType getType() {
@@ -83,8 +97,8 @@ public class Transaction {
     public String toString() {
         return "Transaction{" +
                 "idTransaction=" + idTransaction +
-                ", sourceAccountId=" + sourceAccountId +
-                ", destinationAccountId=" + destinationAccountId +
+                ", sourceAccount=" + (sourceAccount != null ? sourceAccount.getIdAccount() : "null") +
+                ", destinationAccount=" + (destinationAccount != null ? destinationAccount.getIdAccount() : "null") +
                 ", type=" + type +
                 ", amount=" + amount +
                 ", timestamp=" + timestamp +

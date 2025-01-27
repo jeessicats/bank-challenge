@@ -25,16 +25,19 @@ public class ClientValidator {
     }
 
     // Verifica se o cliente tem pelo menos 18 anos
-    public static boolean isAtLeastAge(LocalDate birthDate, int minAge) {
+    public static boolean isValidAge(LocalDate birthDate) {
         if (birthDate == null) {
             return false;
         }
+
         LocalDate today = LocalDate.now();
         int age = today.getYear() - birthDate.getYear();
+
         if (birthDate.plusYears(age).isAfter(today)) {
             age--; // Ajusta a idade se o aniversário ainda não aconteceu este ano
         }
-        return age >= minAge;
+
+        return age >= 18 && age <= 100; // Verifica se a idade está entre 18 e 100 anos
     }
 
     // Verifica se o CPF está em um formato válido

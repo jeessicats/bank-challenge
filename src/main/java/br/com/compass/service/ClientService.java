@@ -2,6 +2,8 @@ package br.com.compass.service;
 
 import br.com.compass.repository.ClientRepository;
 import br.com.compass.util.ClientValidator;
+import br.com.compass.util.JpaUtil;
+import jakarta.persistence.EntityManager;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -11,10 +13,13 @@ public class ClientService {
 
     private final ClientRepository clientRepository;
 
+    // Alteração: Inicializando o ClientRepository com o EntityManager
     public ClientService() {
-        this.clientRepository = new ClientRepository();
+        EntityManager em = JpaUtil.getEntityManager();  // Obter o EntityManager
+        this.clientRepository = new ClientRepository(em); // Passar o EntityManager para o ClientRepository
     }
 
+    // Os outros métodos permanecem inalterados
     public String captureValidFullName(Scanner scanner) {
         while (true) {
             System.out.print("Enter your full name: ");
@@ -45,9 +50,9 @@ public class ClientService {
                     continue;
                 }
 
-                // Validação: Cliente deve ter pelo menos 18 anos
-                if (!ClientValidator.isAtLeastAge(birthDate, 18)) {
-                    System.out.println("Client must be at least 18 years old.");
+                // Verifica se a idade do cliente é válida (entre 18 e 100 anos)
+                if (!ClientValidator.isValidAge(birthDate)) {
+                    System.out.println("Client must be between 18 and 100 years old to open an account.");
                     continue;
                 }
 
