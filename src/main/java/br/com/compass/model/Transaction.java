@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "transactions")
+@Table(name = "transactionlogs")
 public class Transaction {
 
     @Id
@@ -22,13 +22,13 @@ public class Transaction {
     private Account destinationAccount;
 
     @Enumerated(EnumType.STRING) // Salvar o enum como String no banco de dados
-    @Column(nullable = false)
+    @Column(name = "transaction_type", nullable = false)
     private TransactionType type;
 
-    @Column(nullable = false, scale = 2, precision = 20) // BigDecimal configurado
+    @Column(name = "amount", nullable = false, scale = 2, precision = 20) // BigDecimal configurado
     private BigDecimal amount;
 
-    @Column(nullable = false, name = "timestamp")
+    @Column(nullable = false, name = "transaction_date")
     private LocalDateTime timestamp;
 
     // Construtor vazio (obrigatório para o JPA)

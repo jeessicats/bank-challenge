@@ -1,11 +1,10 @@
 package br.com.compass;
 
 import br.com.compass.config.DatabaseConnection;
-import br.com.compass.model.Account;
-import br.com.compass.model.AccountType;
-import br.com.compass.model.Client;
+import br.com.compass.model.*;
 import br.com.compass.repository.AccountRepository;
 import br.com.compass.repository.ClientRepository;
+import br.com.compass.repository.TransactionRepository;
 import br.com.compass.service.AccountService;
 import br.com.compass.service.ClientService;
 import br.com.compass.util.ClientValidator;
@@ -20,6 +19,8 @@ import java.util.Scanner;
 public class App {
 
     private static Client loggedClient;
+    private static TransactionRepository transactionRepository;
+    private static AccountRepository accountRepository;
 
     public static void main(String[] args) {
 
@@ -31,8 +32,9 @@ public class App {
         EntityManager em = JpaUtil.getEntityManager();
 
         // Inicializar os repositórios e serviços que precisarão do EntityManager
-        AccountRepository accountRepository = new AccountRepository(em);
+        accountRepository = new AccountRepository(em); // Use a variável estática
         AccountService accountService = new AccountService(em);
+        transactionRepository = new TransactionRepository(em); // Use a variável estática
 
         Scanner scanner = new Scanner(System.in);
 
@@ -155,7 +157,6 @@ public class App {
                     // ToDo...
                     System.out.println("Deposit.");
                     handleDeposit(scanner, accountRepository, accountService);
-
                     break;
                 case 2:
                     // ToDo...
@@ -175,6 +176,7 @@ public class App {
                 case 5:
                     // ToDo...
                     System.out.println("Bank Statement.");
+                    handleBankStatement(scanner, transactionRepository, accountRepository);
                     break;
                 case 0:
                     // ToDo...
@@ -531,5 +533,67 @@ public class App {
         }
     }
 
+    private static void handleBankStatement(Scanner scanner, TransactionRepository transactionRepository, AccountRepository accountRepository) {
+        if (loggedClient == null) {
+            System.out.println("You need to log in first.");
+            return;
+        }
 
+        // Selecionar conta
+        System.out.println("Fetching bank statement...");
+        List<Account> accounts = accountRepository.findAccountsByCpf(loggedClient.getCpf());
+
+        if (accounts.isEmpty()) {
+            System.out.println("No accounts found for this client.");
+            return;
+        }
+
+        // Exibir contas para seleção
+        Account selectedAccount;
+        if (accounts.size() == 1) {
+            selectedAccount = accounts.get(0); // Apenas uma conta
+            System.out.println("Using your only account:");
+            System.out.println("Account Type: " + selectedAccount.getAccountType());
+        } else {
+            System.out.println("You have multiple accounts. Please select one:");
+            for (int i = 0; i < accounts.size(); i++) {
+                System.out.println((i + 1) + ". " + accounts.get(i).getAccountType());
+            }
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consumir a linha pendente
+            if (choice < 1 || choice > accounts.size()) {
+                System.out.println("Invalid choice.");
+                return;
+            }
+            selectedAccount = accounts.get(choice - 1);
+        }
+
+        // Recuperar e exibir o extrato
+        List<Transaction> transactions = transactionRepository.getBankStatement(selectedAccount.getIdAccount());
+        if (transactions.isEmpty()) {
+            System.out.println("No transactions found for this account.");
+        } else {
+            // Cabeçalho do extrato
+            System.out.println("Bank Statement for " + loggedClient.getFullName() + " - CPF: " + loggedClient.getCpf());
+            System.out.println("----------------------------------");
+
+            for (Transaction transaction : transactions) {
+                System.out.println("Transaction ID: " + transaction.getIdTransaction());
+                System.out.println("Type: " + transaction.getType());
+                System.out.println("Amount: " + transaction.getAmount());
+                System.out.println("Date: " + transaction.getTimestamp());
+
+                // Exibir nome do destinatário no caso de transferência
+                if (transaction.getType() == TransactionType.TRANSFER && transaction.getDestinationAccount() != null) {
+                    Client destinationClient = transaction.getDestinationAccount().getClient();
+                    if (destinationClient != null) {
+                        System.out.println("To: " + destinationClient.getFullName() + " - CPF: " + destinationClient.getCpf());
+                    } else {
+                        System.out.println("To Account ID: " + transaction.getDestinationAccount().getIdAccount());
+                    }
+                }
+                System.out.println("----------------------------------");
+            }
+        }
+    }
 }

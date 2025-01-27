@@ -11,11 +11,14 @@ public class DatabaseConnection {
 
     public static Connection getConnection() throws SQLException {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver"); // Garante o registro do driver
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            System.out.println("MySQL Driver loaded successfully.");
         } catch (ClassNotFoundException e) {
             throw new SQLException("MySQL Driver not found. Include it in your library path!", e);
         }
-        return DriverManager.getConnection(URL, USER, PASSWORD);
+        Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+        System.out.println("Connection established with database: " + URL);
+        return connection;
     }
 
     public static void testConnection() {
