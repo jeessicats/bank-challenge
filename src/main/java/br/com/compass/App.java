@@ -23,7 +23,7 @@ public class App {
         EntityManager em = JpaUtil.getEntityManager();
 
         // Inicializar os repositórios e serviços que precisarão do JpaUtil
-        AccountRepository accountRepository = new AccountRepository();
+        AccountRepository accountRepository = new AccountRepository(em);
         TransactionRepository transactionRepository = new TransactionRepository();
         AccountService accountService = new AccountService();
         ClientRepository clientRepository = new ClientRepository(em);
@@ -419,13 +419,21 @@ public class App {
                     System.out.println("Amount: " + formattedAmount); // Valor formatado
                     System.out.println("Date: " + transaction.getTimestamp());
 
-                    // Exibir nome do destinatário no caso de transferência
-                    if (transaction.getType() == TransactionType.TRANSFER && transaction.getDestinationAccount() != null) {
-                        Client destinationClient = transaction.getDestinationAccount().getClient();
-                        if (destinationClient != null) {
-                            System.out.println("To: " + destinationClient.getFullName() + " - CPF: " + destinationClient.getCpf());
+                    if (transaction.getType() == TransactionType.TRANSFER) {
+                        Optional<Account> destinationAccountOptional = transaction.getDestinationAccount();
+
+                        // Verificar se existe uma conta de destino
+                        if (destinationAccountOptional.isPresent()) {
+                            Account destinationAccount = destinationAccountOptional.get(); // Pega o valor do Optional
+                            Client destinationClient = destinationAccount.getClient();
+
+                            if (destinationClient != null) {
+                                System.out.println("To: " + destinationClient.getFullName() + " - CPF: " + destinationClient.getCpf());
+                            } else {
+                                System.out.println("To Account ID: " + destinationAccount.getIdAccount());
+                            }
                         } else {
-                            System.out.println("To Account ID: " + transaction.getDestinationAccount().getIdAccount());
+                            System.out.println("No destination account available.");
                         }
                     }
                     System.out.println("----------------------------------");

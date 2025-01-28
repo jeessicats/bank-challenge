@@ -1,8 +1,11 @@
 package br.com.compass.model;
 
 import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Objects;
+import java.util.Optional;
 
 @Entity
 @Table(name = "transactionlogs")
@@ -31,7 +34,7 @@ public class Transaction {
     @Column(nullable = false, name = "transaction_date")
     private LocalDateTime timestamp;
 
-    // Construtor vazio (obrigatório para o JPA)
+    // Construtor vazio
     public Transaction() {
     }
 
@@ -61,8 +64,8 @@ public class Transaction {
         this.sourceAccount = sourceAccount;
     }
 
-    public Account getDestinationAccount() {
-        return destinationAccount;
+    public Optional<Account> getDestinationAccount() {
+        return Optional.ofNullable(destinationAccount); // Usando Optional para tratar destino nulo
     }
 
     public void setDestinationAccount(Account destinationAccount) {
@@ -103,5 +106,18 @@ public class Transaction {
                 ", amount=" + amount +
                 ", timestamp=" + timestamp +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Transaction that = (Transaction) o;
+        return idTransaction == that.idTransaction;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idTransaction);
     }
 }

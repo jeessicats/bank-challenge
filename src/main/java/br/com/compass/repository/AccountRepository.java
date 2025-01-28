@@ -2,62 +2,63 @@ package br.com.compass.repository;
 
 import br.com.compass.model.Account;
 import br.com.compass.model.Client;
-import br.com.compass.util.JpaUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.NonUniqueResultException;
 import jakarta.persistence.TypedQuery;
 
+import java.util.Collections;
 import java.util.List;
 
 public class AccountRepository {
 
-    // Busca contas pelo CPF associado ao cliente
+    private EntityManager em;
+
+    // Construtor com injeção de EntityManager
+    public AccountRepository(EntityManager em) {
+        this.em = em;
+    }
+
+    // Busca cliente pelo CPF associado à conta
     public Client findClientFromAccountByCpf(String cpf) {
-        EntityManager em = JpaUtil.getEntityManager();
         try {
             String jpql = "SELECT c FROM Client c WHERE c.cpf = :cpf";
             TypedQuery<Client> query = em.createQuery(jpql, Client.class);
             query.setParameter("cpf", cpf);
             return query.getSingleResult();
         } catch (NoResultException e) {
-            return null;
+            return null;  // Retorna null se não encontrar
         } catch (NonUniqueResultException e) {
             throw new IllegalStateException("Multiple clients found with the same CPF.");
-        } finally {
-            em.close(); // Garante o fechamento do EntityManager
         }
     }
 
-    // Recupera contas associadas ao CPF
+    // Recupera todas as contas associadas ao CPF
     public List<Account> findAccountsByCpf(String cpf) {
-        EntityManager em = JpaUtil.getEntityManager();
         try {
             String jpql = "SELECT a FROM Account a WHERE a.client.cpf = :cpf";
             TypedQuery<Account> query = em.createQuery(jpql, Account.class);
             query.setParameter("cpf", cpf);
-            return query.getResultList();
-        } finally {
-            em.close(); // Garante o fechamento do EntityManager
+            return query.getResultList();  // Retorna lista, pode ser vazia
+        } catch (Exception e) {
+            System.err.println("Error fetching accounts: " + e.getMessage());
+            return Collections.emptyList();  // Retorna lista vazia em caso de erro
         }
     }
 
-    // Salva uma conta no banco
+    // Salva uma conta no banco de dados
     public boolean save(Account account) {
-        EntityManager em = JpaUtil.getEntityManager();
         try {
             em.getTransaction().begin();
             em.persist(account);
             em.getTransaction().commit();
-            return true;
+            return true;  // Sucesso na operação
         } catch (Exception e) {
             if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
+                em.getTransaction().rollback();  // Realiza rollback em caso de erro
             }
             System.err.println("Error saving account: " + e.getMessage());
-            return false;
-        } finally {
-            em.close(); // Garante o fechamento do EntityManager
+            return false;  // Retorna false se falhar
         }
     }
 }
