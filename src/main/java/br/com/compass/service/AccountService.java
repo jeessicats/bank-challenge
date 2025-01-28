@@ -8,7 +8,9 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.time.LocalDateTime;
+import java.util.Locale;
 
 public class AccountService {
 
@@ -160,5 +162,10 @@ public class AccountService {
         } finally {
             em.close(); // Certifique-se de fechar o EntityManager
         }
+    }
+
+    public static String formatCurrency(double amount) {
+        NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
+        return currencyFormatter.format(amount);
     }
 }

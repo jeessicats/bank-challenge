@@ -1,5 +1,6 @@
 package br.com.compass.service;
 
+import br.com.compass.model.Client;
 import br.com.compass.repository.ClientRepository;
 import br.com.compass.util.ClientValidator;
 import br.com.compass.util.JpaUtil;
@@ -96,4 +97,16 @@ public class ClientService {
             System.out.println("Password does not meet the required criteria. Please try again.");
         }
     }
+
+    public Client captureClientDetails(Scanner scanner) {
+        String fullName = captureValidFullName(scanner);
+        LocalDate birthDate = captureValidBirthDate(scanner);
+        String cpf = ClientValidator.promptForValidCpf(scanner);
+        String phoneNumber = captureValidPhoneNumber(scanner);
+        String email = captureValidEmail(scanner);
+        String password = captureValidPassword(scanner);
+
+        return new Client(fullName, birthDate, cpf, phoneNumber, email, password);
+    }
+
 }

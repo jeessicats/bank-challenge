@@ -12,7 +12,6 @@ import br.com.compass.util.JpaUtil;
 import jakarta.persistence.EntityManager;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.*;
 
 public class App {
@@ -79,12 +78,12 @@ public class App {
 
     // Menu login
     public static void loginMenu(Scanner scanner, AccountRepository accountRepository, AccountService accountService, TransactionRepository transactionRepository) {
-        System.out.println();
-        System.out.println("========= Login Menu =========");
+        boolean running = true;
 
-        boolean loginSuccessful = false;
+        while (running) {
+            System.out.println();
+            System.out.println("========= Login Menu =========");
 
-        while (!loginSuccessful) {
             String cpf = ClientValidator.promptForValidCpf(scanner);
 
             try {
@@ -101,8 +100,9 @@ public class App {
                 if (client.getPassword().equals(password)) {
                     loggedClient = client;
                     System.out.println("Login successful! Welcome, " + client.getFullName() + "!");
+                    System.out.println();
                     bankMenu(scanner, accountRepository, accountService, transactionRepository);
-                    loginSuccessful = true;
+                    running = false; // Finaliza o loop após o login bem-sucedido
                 } else {
                     System.out.println("Invalid password. Please try again.");
                 }
@@ -118,14 +118,15 @@ public class App {
 
         while (running) {
             System.out.println();
-            System.out.println("========= Bank Menu =========");
-            System.out.println("|| 1. Deposit              ||");
-            System.out.println("|| 2. Withdraw             ||");
-            System.out.println("|| 3. Check Balance        ||");
-            System.out.println("|| 4. Transfer             ||");
-            System.out.println("|| 5. Bank Statement       ||");
-            System.out.println("|| 0. Back to Main Menu    ||");
-            System.out.println("=============================");
+            System.out.println("========= Bank Menu ================");
+            System.out.println("|| 1. Deposit                     ||");
+            System.out.println("|| 2. Withdraw                    ||");
+            System.out.println("|| 3. Check Balance               ||");
+            System.out.println("|| 4. Transfer                    ||");
+            System.out.println("|| 5. Bank Statement              ||");
+            System.out.println("|| 6. Create Additional Account   ||");
+            System.out.println("|| 0. Back to Main Menu           ||");
+            System.out.println("====================================");
             System.out.print("Choose an option: ");
 
             int option = scanner.nextInt();
@@ -146,9 +147,15 @@ public class App {
                 case 5:
                     handleBankStatement(scanner, transactionRepository, accountRepository);
                     break;
-                case 0:
-                    running = false;
+                case 6:
+                    System.out.println("Create new account.");
+                    handleAccountCreation(scanner, accountRepository);
                     break;
+                case 0:
+                    // ToDo...
+                    System.out.println("Returning to Main Menu...");
+                    mainMenu(scanner, accountRepository, accountService, transactionRepository);
+                    return;
                 default:
                     System.out.println("Invalid option! Please try again.");
             }
@@ -160,62 +167,47 @@ public class App {
         System.out.println();
         System.out.println("========= Account Opening Menu =========");
 
+        EntityManager em = JpaUtil.getEntityManager(); // Obter o EntityManager
+        ClientService clientService = new ClientService(); // Inicializar o ClientService fora do loop
+        ClientRepository clientRepository = new ClientRepository(em); // Repositório de cliente
+
         boolean running = true;
 
         while (running) {
             try {
-                ClientService clientService = new ClientService();
-                EntityManager em = JpaUtil.getEntityManager(); // Obtenha o EntityManager
-                ClientRepository clientRepository = new ClientRepository(em);
-
                 System.out.println("Please enter the following details to open a new account:");
 
-                // Pede os dados do cliente usando os métodos da classe ClientService
-                String fullName = clientService.captureValidFullName(scanner);
-                LocalDate birthDate = clientService.captureValidBirthDate(scanner);
-                String cpf = ClientValidator.promptForValidCpf(scanner);
-
-                String phoneNumber = clientService.captureValidPhoneNumber(scanner);
-                String email = clientService.captureValidEmail(scanner);
-                String password = clientService.captureValidPassword(scanner);
-
-                // Verifica se a idade do cliente é válida (entre 18 e 100 anos)
-                if (!ClientValidator.isValidAge(birthDate)) {
-                    System.out.println("Client must be between 18 and 100 years old to open an account.");
-                    continue;
-                }
-
-                // Criar o objeto Cliente com os dados validados
-                Client client = new Client(fullName, birthDate, cpf, phoneNumber, email, password);
+                // Captura todos os dados do cliente diretamente do ClientService
+                Client client = clientService.captureClientDetails(scanner);
 
                 // Salvar cliente no banco de dados
-                if (clientRepository.save(client)) {
-                    System.out.println("Client saved successfully!");
-                } else {
+                if (!clientRepository.save(client)) {
                     System.err.println("Failed to save client.");
                     continue;
                 }
+                System.out.println("Client saved successfully!");
 
-                // Usar o método `selectAccountType` para selecionar o tipo de conta
-                List<AccountType> allAccountTypes = Arrays.asList(AccountType.values());
-                AccountType selectedAccountType = selectAccountType(scanner, allAccountTypes);
+                // Selecionar o tipo de conta
+                AccountType selectedAccountType = selectAccountType(scanner, Arrays.asList(AccountType.values()));
 
                 // Criar a conta
                 Account account = new Account(client, selectedAccountType);
 
                 // Salvar conta no banco de dados
-                if (accountRepository.save(account)) {
-                    System.out.println("\nAccount successfully created!");
-                    System.out.println("Account Details:");
-                    System.out.println("Client Name: " + client.getFullName());
-                    System.out.println("Account Type: " + selectedAccountType);
-                    System.out.println("Balance: " + account.getBalance());
-                    System.out.println("Creation Date: " + account.getCreationDate());
-                    running = false; // Finaliza o loop após criar a conta
-                } else {
+                if (!accountRepository.save(account)) {
                     System.err.println("Failed to save account.");
+                    continue;
                 }
 
+                // Exibir detalhes da conta criada
+                System.out.println("\nAccount successfully created!");
+                System.out.println("Account Details:");
+                System.out.println("Client Name: " + client.getFullName());
+                System.out.println("Account Type: " + selectedAccountType);
+                System.out.println("Balance: " + account.getBalance());
+                System.out.println("Creation Date: " + account.getCreationDate());
+
+                running = false; // Finalizar o loop após criar a conta
             } catch (Exception e) {
                 System.out.println("An unexpected error occurred: " + e.getMessage());
             }
@@ -223,15 +215,16 @@ public class App {
     }
 
     private static void handleDeposit(Scanner scanner, AccountRepository accountRepository, AccountService accountService) {
-        if (loggedClient == null) {
-            System.out.println("You need to log in first.");
-            return;
-        }
-
         try {
+            // Selecionar a conta
             Account selectedAccount = selectAccount(scanner, accountRepository);
             if (selectedAccount == null) return;
 
+            // Exibir o saldo atual da conta
+            String formattedBalance = AccountService.formatCurrency(selectedAccount.getBalance().doubleValue());
+            System.out.println("Your current balance: " + formattedBalance);
+
+            // Solicitar o valor do depósito
             BigDecimal depositAmount;
             while (true) {
                 System.out.print("Enter the deposit amount: ");
@@ -245,7 +238,17 @@ public class App {
                 }
             }
 
+            // Formatar o valor do depósito para exibição
+            String formattedDepositAmount = AccountService.formatCurrency(depositAmount.doubleValue());
+
+            // Realizar o depósito
             accountService.deposit(selectedAccount, depositAmount);
+
+            // Exibir mensagem de sucesso e o saldo atualizado
+            String formattedUpdatedBalance = AccountService.formatCurrency(selectedAccount.getBalance().doubleValue());
+            System.out.println("Deposit completed successfully!");
+            System.out.println("Deposited amount: " + formattedDepositAmount);
+            System.out.println("Your updated balance: " + formattedUpdatedBalance);
 
         } catch (Exception e) {
             System.out.println("An error occurred during the deposit: " + e.getMessage());
@@ -253,15 +256,14 @@ public class App {
     }
 
     private static void handleWithdraw(Scanner scanner, AccountRepository accountRepository, AccountService accountService) {
-        if (loggedClient == null) {
-            System.out.println("You need to log in first.");
-            return;
-        }
-
         try {
             // Utilizar o método refatorado para selecionar a conta
             Account selectedAccount = selectAccount(scanner, accountRepository);
             if (selectedAccount == null) return;
+
+            // Exibir o saldo atual da conta
+            String formattedBalance = AccountService.formatCurrency(selectedAccount.getBalance().doubleValue());
+            System.out.println("Your current balance: " + formattedBalance);
 
             BigDecimal withdrawAmount;
             while (true) {
@@ -280,8 +282,17 @@ public class App {
                 }
             }
 
+            // Formatar o valor do saque para exibição
+            String formattedWithdrawAmount = AccountService.formatCurrency(withdrawAmount.doubleValue());
+
             // Realizar o saque
             accountService.withdraw(selectedAccount, withdrawAmount);
+
+            // Exibir mensagem de sucesso e o saldo atualizado
+            String formattedUpdatedBalance = AccountService.formatCurrency(selectedAccount.getBalance().doubleValue());
+            System.out.println("Withdrawal completed successfully!");
+            System.out.println("Withdrawn amount: " + formattedWithdrawAmount);
+            System.out.println("Your updated balance: " + formattedUpdatedBalance);
 
         } catch (Exception e) {
             System.out.println("An error occurred during the withdrawal: " + e.getMessage());
@@ -289,19 +300,17 @@ public class App {
     }
 
     private static void handleCheckBalance(Scanner scanner, AccountRepository accountRepository) {
-        if (loggedClient == null) {
-            System.out.println("You need to log in first.");
-            return;
-        }
-
         try {
             // Utilizar o método refatorado para selecionar a conta
             Account selectedAccount = selectAccount(scanner, accountRepository);
             if (selectedAccount == null) return;
 
-            // Exibir o saldo da conta selecionada
+            // Formatar o saldo da conta selecionada
+            String formattedBalance = AccountService.formatCurrency(selectedAccount.getBalance().doubleValue());
+
+            // Exibir o tipo de conta e o saldo formatado
             System.out.println("Account Type: " + selectedAccount.getAccountType());
-            System.out.println("Balance: " + selectedAccount.getBalance());
+            System.out.println("Balance: " + formattedBalance);
 
         } catch (Exception e) {
             System.out.println("An error occurred during the balance check: " + e.getMessage());
@@ -309,15 +318,14 @@ public class App {
     }
 
     private static void handleTransfer(Scanner scanner, AccountRepository accountRepository, AccountService accountService) {
-        if (loggedClient == null) {
-            System.out.println("You need to log in first.");
-            return;
-        }
-
         try {
             // Selecionar a conta de origem usando o método refatorado
             Account sourceAccount = selectAccount(scanner, accountRepository);
             if (sourceAccount == null) return;
+
+            // Mostrar o saldo da conta de origem antes da transferência
+            String formattedSourceBalance = AccountService.formatCurrency(sourceAccount.getBalance().doubleValue());
+            System.out.println("Your current balance: " + formattedSourceBalance);
 
             // Solicitar o CPF do destinatário
             String recipientCpf = ClientValidator.promptForValidCpf(scanner);
@@ -373,24 +381,26 @@ public class App {
                 }
             }
 
+            // Formatar o valor da transferência para exibição
+            String formattedTransferAmount = AccountService.formatCurrency(transferAmount.doubleValue());
+
             // Realizar a transferência
             accountService.transfer(sourceAccount, destinationAccount, transferAmount);
 
+            // Formatar o saldo atualizado da conta de origem
+            String formattedUpdatedBalance = AccountService.formatCurrency(sourceAccount.getBalance().doubleValue());
+
             // Exibir mensagem de sucesso
             System.out.println("Transfer completed successfully!");
-            System.out.println("Transferred " + transferAmount + " from " + sourceAccount.getAccountType() +
+            System.out.println("Transferred " + formattedTransferAmount + " from " + sourceAccount.getAccountType() +
                     " to " + destinationAccount.getAccountType() + " (Recipient: " + recipientName + ")");
+            System.out.println("Your updated balance: " + formattedUpdatedBalance);
         } catch (Exception e) {
             System.out.println("An error occurred during the transfer: " + e.getMessage());
         }
     }
 
     private static void handleBankStatement(Scanner scanner, TransactionRepository transactionRepository, AccountRepository accountRepository) {
-        if (loggedClient == null) {
-            System.out.println("You need to log in first.");
-            return;
-        }
-
         try {
             // Utilizar o método refatorado para selecionar a conta
             Account selectedAccount = selectAccount(scanner, accountRepository);
@@ -406,8 +416,11 @@ public class App {
                 System.out.println("----------------------------------");
 
                 for (Transaction transaction : transactions) {
+                    // Formatar o valor da transação
+                    String formattedAmount = AccountService.formatCurrency(transaction.getAmount().doubleValue());
+
                     System.out.println("Type: " + transaction.getType());
-                    System.out.println("Amount: " + transaction.getAmount());
+                    System.out.println("Amount: " + formattedAmount); // Valor formatado
                     System.out.println("Date: " + transaction.getTimestamp());
 
                     // Exibir nome do destinatário no caso de transferência
@@ -428,11 +441,6 @@ public class App {
     }
 
     private static void handleAccountCreation(Scanner scanner, AccountRepository accountRepository) {
-        if (loggedClient == null) {
-            System.out.println("You need to log in first to create additional accounts.");
-            return;
-        }
-
         try {
             // Buscar todas as contas associadas ao cliente logado
             List<Account> accounts = accountRepository.findAccountsByCpf(loggedClient.getCpf());
@@ -454,14 +462,17 @@ public class App {
                 return;
             }
 
-            // Usar o método auxiliar para selecionar o tipo de conta
+            // Método para selecionar o tipo de conta
             AccountType selectedAccountType = selectAccountType(scanner, availableAccountTypes);
 
             // Criar a conta
             Account newAccount = new Account(loggedClient, selectedAccountType);
             if (accountRepository.save(newAccount)) {
+                // Usar o método formatCurrency para formatar o saldo
+                String formattedBalance = AccountService.formatCurrency(newAccount.getBalance().doubleValue());
+
                 System.out.println("Account created successfully!");
-                System.out.println("Account Type: " + selectedAccountType + " - Balance: " + newAccount.getBalance());
+                System.out.println("Account Type: " + selectedAccountType + " - Balance: " + formattedBalance);
             } else {
                 System.out.println("Failed to create the account. Please try again.");
             }
@@ -479,26 +490,32 @@ public class App {
 
         if (accounts.size() == 1) {
             Account selectedAccount = accounts.get(0);
-            System.out.println("Using your only account:");
             System.out.println("Account Type: " + selectedAccount.getAccountType());
             return selectedAccount;
         }
 
-        System.out.println("You have multiple accounts. Please select one:");
-        for (int i = 0; i < accounts.size(); i++) {
-            System.out.println((i + 1) + ". " + accounts.get(i).getAccountType());
+        while (true) {
+            System.out.println("You have multiple accounts. Please select one: ");
+            for (int i = 0; i < accounts.size(); i++) {
+                System.out.println((i + 1) + ". " + accounts.get(i).getAccountType());
+            }
+            System.out.println("0. Cancel");
+
+            System.out.print("Select an account (or 0 to cancel): ");
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+
+            if (choice == 0) {
+                System.out.println("Operation canceled.");
+                return null; // Cancela a operação se o cliente escolher 0
+            }
+
+            if (choice >= 1 && choice <= accounts.size()) {
+                return accounts.get(choice - 1); // Retorna a conta selecionada
+            }
+
+            System.out.println("Invalid choice. Please try again.");
         }
-
-        System.out.print("Select an account: ");
-        int choice = scanner.nextInt();
-        scanner.nextLine();
-
-        if (choice < 1 || choice > accounts.size()) {
-            System.out.println("Invalid choice. Operation canceled.");
-            return null;
-        }
-
-        return accounts.get(choice - 1);
     }
 
     private static AccountType selectAccountType(Scanner scanner, List<AccountType> availableAccountTypes) {
@@ -506,17 +523,23 @@ public class App {
         for (int i = 0; i < availableAccountTypes.size(); i++) {
             System.out.println((i + 1) + ". " + availableAccountTypes.get(i));
         }
+        System.out.println("0. Cancel");
 
         while (true) {
-            System.out.print("Select an account type to create: ");
+            System.out.print("Select an account type to create (or 0 to cancel): ");
             int choice = scanner.nextInt();
             scanner.nextLine(); // Consome a nova linha pendente após nextInt()
 
-            if (choice >= 1 && choice <= availableAccountTypes.size()) {
-                return availableAccountTypes.get(choice - 1);
-            } else {
-                System.out.println("Invalid choice. Please try again.");
+            if (choice == 0) {
+                System.out.println("Operation canceled.");
+                return null; // Retorna null se o usuário cancelar
             }
+
+            if (choice >= 1 && choice <= availableAccountTypes.size()) {
+                return availableAccountTypes.get(choice - 1); // Retorna o tipo de conta selecionado
+            }
+
+            System.out.println("Invalid choice. Please try again.");
         }
     }
 }
