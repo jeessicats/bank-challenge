@@ -25,9 +25,9 @@ public class App {
         // Inicializar os repositórios e serviços que precisarão do JpaUtil
         AccountRepository accountRepository = new AccountRepository(em);
         TransactionRepository transactionRepository = new TransactionRepository(em);
-        AccountService accountService = new AccountService();
+        AccountService accountService = new AccountService(em);
         ClientRepository clientRepository = new ClientRepository(em);
-        ClientService clientService = new ClientService();
+        ClientService clientService = new ClientService(em);
 
         Scanner scanner = new Scanner(System.in);
 

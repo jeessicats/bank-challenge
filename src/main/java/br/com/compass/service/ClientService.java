@@ -3,7 +3,6 @@ package br.com.compass.service;
 import br.com.compass.model.Client;
 import br.com.compass.repository.ClientRepository;
 import br.com.compass.util.ClientValidator;
-import br.com.compass.util.JpaUtil;
 import jakarta.persistence.EntityManager;
 
 import java.time.LocalDate;
@@ -13,14 +12,15 @@ import java.util.Scanner;
 public class ClientService {
 
     private final ClientRepository clientRepository;
+    private final EntityManager em;
 
-    // Alteração: Inicializando o ClientRepository com o EntityManager
-    public ClientService() {
-        EntityManager em = JpaUtil.getEntityManager();  // Obter o EntityManager
-        this.clientRepository = new ClientRepository(em); // Passar o EntityManager para o ClientRepository
+    // Construtor com injeção do EntityManager
+    public ClientService(EntityManager em) {
+        this.em = em;
+        this.clientRepository = new ClientRepository(em);
     }
 
-    // Os outros métodos permanecem inalterados
+    // Captura um nome válido do usuário
     public String captureValidFullName(Scanner scanner) {
         while (true) {
             System.out.print("Enter your full name: ");
@@ -32,6 +32,7 @@ public class ClientService {
         }
     }
 
+    // Captura e valida a data de nascimento do cliente
     public LocalDate captureValidBirthDate(Scanner scanner) {
         while (true) {
             System.out.print("Enter your birth date (yyyy-MM-dd): ");
@@ -39,19 +40,16 @@ public class ClientService {
                 String birthDateInput = scanner.nextLine();
                 LocalDate birthDate = LocalDate.parse(birthDateInput);
 
-                // Validação: Data não pode ser nula
                 if (!ClientValidator.isValidDate(birthDate)) {
                     System.out.println("Birth date cannot be null.");
                     continue;
                 }
 
-                // Validação: Data não pode estar no futuro
                 if (!ClientValidator.isNotInFuture(birthDate)) {
                     System.out.println("Birth date cannot be in the future.");
                     continue;
                 }
 
-                // Verifica se a idade do cliente é válida (entre 18 e 100 anos)
                 if (!ClientValidator.isValidAge(birthDate)) {
                     System.out.println("Client must be between 18 and 100 years old to open an account.");
                     continue;
@@ -65,6 +63,7 @@ public class ClientService {
         }
     }
 
+    // Captura e valida o número de telefone
     public String captureValidPhoneNumber(Scanner scanner) {
         while (true) {
             System.out.print("Enter your phone number with the local code (10 or 11 digits, numbers only): ");
@@ -76,6 +75,7 @@ public class ClientService {
         }
     }
 
+    // Captura e valida o email do usuário
     public String captureValidEmail(Scanner scanner) {
         while (true) {
             System.out.print("Enter your email: ");
@@ -87,6 +87,7 @@ public class ClientService {
         }
     }
 
+    // Captura e valida a senha do usuário
     public String captureValidPassword(Scanner scanner) {
         while (true) {
             System.out.print("Enter your password (at least 8 characters, including 1 uppercase letter and 1 number): ");
@@ -98,6 +99,7 @@ public class ClientService {
         }
     }
 
+    // Captura os dados do cliente e retorna um objeto Client
     public Client captureClientDetails(Scanner scanner) {
         String fullName = captureValidFullName(scanner);
         LocalDate birthDate = captureValidBirthDate(scanner);
@@ -108,5 +110,4 @@ public class ClientService {
 
         return new Client(fullName, birthDate, cpf, phoneNumber, email, password);
     }
-
 }
