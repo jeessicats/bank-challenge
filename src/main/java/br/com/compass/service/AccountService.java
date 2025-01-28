@@ -1,11 +1,13 @@
 package br.com.compass.service;
 
 import br.com.compass.model.Account;
+import br.com.compass.model.Client;
 import br.com.compass.model.Transaction;
 import br.com.compass.model.TransactionType;
 import br.com.compass.util.JpaUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
@@ -168,4 +170,9 @@ public class AccountService {
         NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
         return currencyFormatter.format(amount);
     }
+
+    public boolean validatePassword(Client client, String rawPassword) {
+        return BCrypt.checkpw(rawPassword, client.getPassword());
+    }
+
 }

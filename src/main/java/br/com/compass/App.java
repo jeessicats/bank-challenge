@@ -1,6 +1,5 @@
 package br.com.compass;
 
-import br.com.compass.config.DatabaseConnection;
 import br.com.compass.model.*;
 import br.com.compass.repository.AccountRepository;
 import br.com.compass.repository.ClientRepository;
@@ -20,10 +19,6 @@ public class App {
 
     public static void main(String[] args) {
 
-        // Teste de conexão com o banco de dados
-        System.out.println("Testing database connection...");
-        DatabaseConnection.testConnection();
-
         // Iniciar EntityManager
         EntityManager em = JpaUtil.getEntityManager();
 
@@ -31,6 +26,7 @@ public class App {
         AccountRepository accountRepository = new AccountRepository();
         TransactionRepository transactionRepository = new TransactionRepository();
         AccountService accountService = new AccountService();
+        ClientRepository clientRepository = new ClientRepository(em);
 
         Scanner scanner = new Scanner(System.in);
 

@@ -1,7 +1,9 @@
 package br.com.compass.model;
 
 import jakarta.persistence.*;
+
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 @Table(name = "clients")
@@ -30,28 +32,12 @@ public class Client {
     @Column(name =  "client_password", nullable = false)
     private String password;
 
-    // Construtor vazio (obrigatório para o JPA)
+    // Construtor vazio
     public Client() {
-    }
-
-    // Construtor com ID
-    public Client(Integer idClient) {
-        this.idClient = idClient;
     }
 
     // Construtor completo sem o ID
     public Client(String fullName, LocalDate birthDate, String cpf, String phoneNumber, String email, String password) {
-        this.fullName = fullName;
-        this.birthDate = birthDate;
-        this.cpf = cpf;
-        this.phoneNumber = phoneNumber;
-        this.email = email;
-        this.password = password;
-    }
-
-    // Construtor completo com o ID
-    public Client(Integer idClient, String fullName, LocalDate birthDate, String cpf, String phoneNumber, String email, String password) {
-        this.idClient = idClient;
         this.fullName = fullName;
         this.birthDate = birthDate;
         this.cpf = cpf;
@@ -115,5 +101,31 @@ public class Client {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    @Override
+    public String toString() {
+        return "Client{" +
+                "idClient=" + idClient +
+                ", fullName='" + fullName + '\'' +
+                ", birthDate=" + birthDate +
+                ", cpf='" + cpf + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", email='" + email + '\'' +
+                '}';
+    }
+
+    // Equals e HashCode baseados no ID
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Client client = (Client) o;
+        return Objects.equals(idClient, client.idClient);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idClient);
     }
 }

@@ -3,7 +3,6 @@
         <class>br.com.compass.model.Client</class>
         <class>br.com.compass.model.Account</class>
         <class>br.com.compass.model.Transaction</class>
-        <!-- Adicione outras classes do modelo aqui -->
 
         <properties>
             <!-- Configurações do banco de dados -->
@@ -15,9 +14,9 @@
             <!-- Configurações do Hibernate -->
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect" />
             <property name="hibernate.hbm2ddl.auto" value="update" />
-            <!-- Desativando o log do Hibernate -->
             <property name="hibernate.show_sql" value="false" />
             <property name="hibernate.format_sql" value="false" />
+
         </properties>
     </persistence-unit>
 </persistence>
