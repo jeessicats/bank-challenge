@@ -4,6 +4,7 @@ import br.com.compass.model.Account;
 import br.com.compass.model.Client;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
+import jakarta.persistence.NonUniqueResultException;
 import jakarta.persistence.TypedQuery;
 
 import java.util.List;
@@ -19,15 +20,16 @@ public class AccountRepository {
 
     // Busca contas pelo CPF associado ao cliente
     public Client findClientFromAccountByCpf(String cpf) {
-        String jpql = "SELECT a FROM Account a JOIN FETCH a.client WHERE a.client.cpf = :cpf";
-        TypedQuery<Account> query = em.createQuery(jpql, Account.class);
+        String jpql = "SELECT c FROM Client c WHERE c.cpf = :cpf"; // Busca diretamente o cliente pelo CPF
+        TypedQuery<Client> query = em.createQuery(jpql, Client.class);
         query.setParameter("cpf", cpf);
 
         try {
-            Account account = query.getSingleResult();  // Obtém a conta associada ao CPF
-            return account.getClient();  // Retorna o cliente associado à conta
+            return query.getSingleResult(); // Retorna o cliente único associado ao CPF
         } catch (NoResultException e) {
-            return null;  // Caso não encontre nenhuma conta associada ao CPF
+            return null; // Retorna null se nenhum cliente for encontrado
+        } catch (NonUniqueResultException e) {
+            throw new IllegalStateException("Multiple clients found with the same CPF."); // Exceção se houver duplicados
         }
     }
 
