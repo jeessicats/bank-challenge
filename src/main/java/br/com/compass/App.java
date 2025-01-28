@@ -18,8 +18,6 @@ import java.util.*;
 public class App {
 
     private static Client loggedClient;
-    private static TransactionRepository transactionRepository;
-    private static AccountRepository accountRepository;
 
     public static void main(String[] args) {
 
@@ -27,17 +25,18 @@ public class App {
         System.out.println("Testing database connection...");
         DatabaseConnection.testConnection();
 
-        // Inicializar EntityManager
+        // Iniciar EntityManager
         EntityManager em = JpaUtil.getEntityManager();
 
-        // Inicializar os repositórios e serviços que precisarão do EntityManager
-        accountRepository = new AccountRepository(em); // Use a variável estática
-        AccountService accountService = new AccountService(em);
-        transactionRepository = new TransactionRepository(em); // Use a variável estática
+        // Inicializar os repositórios e serviços que precisarão do JpaUtil
+        AccountRepository accountRepository = new AccountRepository();
+        TransactionRepository transactionRepository = new TransactionRepository();
+        AccountService accountService = new AccountService();
 
         Scanner scanner = new Scanner(System.in);
 
-        mainMenu(scanner, accountRepository, accountService);
+        // Iniciar o menu principal
+        mainMenu(scanner, accountRepository, accountService, transactionRepository);
 
         scanner.close();
 
@@ -47,7 +46,7 @@ public class App {
         System.out.println("Application closed");
     }
 
-    public static void mainMenu(Scanner scanner, AccountRepository accountRepository, AccountService accountService) {
+    public static void mainMenu(Scanner scanner, AccountRepository accountRepository, AccountService accountService, TransactionRepository transactionRepository) {
         boolean running = true;
 
         while (running) {
@@ -64,7 +63,7 @@ public class App {
 
             switch (option) {
                 case 1:
-                    loginMenu(scanner, accountRepository, accountService);
+                    loginMenu(scanner, accountRepository, accountService, transactionRepository);
                     return;
                 case 2:
                     accountOpeningMenu(scanner, accountRepository);
@@ -79,54 +78,42 @@ public class App {
     }
 
     // Menu login
-    public static void loginMenu(Scanner scanner, AccountRepository accountRepository, AccountService accountService) {
+    public static void loginMenu(Scanner scanner, AccountRepository accountRepository, AccountService accountService, TransactionRepository transactionRepository) {
         System.out.println();
         System.out.println("========= Login Menu =========");
 
         boolean loginSuccessful = false;
 
         while (!loginSuccessful) {
-            // Valida o CPF usando o método do ClientValidator
-            System.out.print("Enter your CPF: ");
-            String cpf = scanner.nextLine();
-
-            if (!ClientValidator.isValidCpf(cpf)) {
-                System.out.println("Invalid CPF format. Please try again.");
-                continue; // Retorna ao início do loop para tentar novamente
-            }
+            String cpf = ClientValidator.promptForValidCpf(scanner);
 
             try {
-                // Busca o cliente associado ao CPF
                 Client client = accountRepository.findClientFromAccountByCpf(cpf);
 
                 if (client == null) {
                     System.out.println("No account found for CPF: " + cpf);
-                    continue; // Retorna ao início do loop para tentar novamente
+                    continue;
                 }
 
-                // CPF válido e cliente encontrado, solicita a senha
                 System.out.print("Enter your password: ");
                 String password = scanner.nextLine();
 
-                // Valida a senha
                 if (client.getPassword().equals(password)) {
-                    loggedClient = client; // Define o cliente logado
+                    loggedClient = client;
                     System.out.println("Login successful! Welcome, " + client.getFullName() + "!");
-                    bankMenu(scanner, accountRepository, accountService); // Redireciona para o menu bancário
-                    loginSuccessful = true; // Finaliza o loop após login bem-sucedido
+                    bankMenu(scanner, accountRepository, accountService, transactionRepository);
+                    loginSuccessful = true;
                 } else {
                     System.out.println("Invalid password. Please try again.");
                 }
 
             } catch (Exception e) {
-                e.printStackTrace(); // Mostra o rastreamento de pilha completo para depuração
                 System.err.println("Error during login: " + e.getMessage());
             }
         }
     }
 
-
-    public static void bankMenu(Scanner scanner, AccountRepository accountRepository, AccountService accountService) {
+    public static void bankMenu(Scanner scanner, AccountRepository accountRepository, AccountService accountService, TransactionRepository transactionRepository) {
         boolean running = true;
 
         while (running) {
@@ -137,7 +124,6 @@ public class App {
             System.out.println("|| 3. Check Balance        ||");
             System.out.println("|| 4. Transfer             ||");
             System.out.println("|| 5. Bank Statement       ||");
-            System.out.println("|| 6. Create new account   ||");
             System.out.println("|| 0. Back to Main Menu    ||");
             System.out.println("=============================");
             System.out.print("Choose an option: ");
@@ -146,39 +132,23 @@ public class App {
 
             switch (option) {
                 case 1:
-                    // ToDo...
-                    System.out.println("Deposit.");
                     handleDeposit(scanner, accountRepository, accountService);
                     break;
                 case 2:
-                    // ToDo...
-                    System.out.println("Withdraw.");
                     handleWithdraw(scanner, accountRepository, accountService);
                     break;
                 case 3:
-                    // ToDo...
-                    System.out.println("Check Balance.");
                     handleCheckBalance(scanner, accountRepository);
                     break;
                 case 4:
-                    // ToDo...
-                    System.out.println("Transfer.");
                     handleTransfer(scanner, accountRepository, accountService);
                     break;
                 case 5:
-                    // ToDo...
-                    System.out.println("Bank Statement.");
                     handleBankStatement(scanner, transactionRepository, accountRepository);
                     break;
-                case 6:
-                    System.out.println("Create new account.");
-                    handleAccountCreation(scanner, accountRepository);
-                    break;
                 case 0:
-                    // ToDo...
-                    System.out.println("Returning to Main Menu...");
-                    mainMenu(scanner, accountRepository, accountService);
-                    return;
+                    running = false;
+                    break;
                 default:
                     System.out.println("Invalid option! Please try again.");
             }
@@ -203,7 +173,8 @@ public class App {
                 // Pede os dados do cliente usando os métodos da classe ClientService
                 String fullName = clientService.captureValidFullName(scanner);
                 LocalDate birthDate = clientService.captureValidBirthDate(scanner);
-                String cpf = clientService.captureValidCpf(scanner);
+                String cpf = ClientValidator.promptForValidCpf(scanner);
+
                 String phoneNumber = clientService.captureValidPhoneNumber(scanner);
                 String email = clientService.captureValidEmail(scanner);
                 String password = clientService.captureValidPassword(scanner);
@@ -349,16 +320,7 @@ public class App {
             if (sourceAccount == null) return;
 
             // Solicitar o CPF do destinatário
-            String recipientCpf;
-            while (true) {
-                System.out.print("Enter recipient's CPF: ");
-                recipientCpf = scanner.nextLine().trim();
-
-                if (!recipientCpf.isEmpty()) {
-                    break; // CPF válido, sai do loop
-                }
-                System.out.println("CPF cannot be empty. Please try again.");
-            }
+            String recipientCpf = ClientValidator.promptForValidCpf(scanner);
 
             // Buscar contas associadas ao CPF do destinatário
             List<Account> recipientAccounts = accountRepository.findAccountsByCpf(recipientCpf);

@@ -13,11 +13,11 @@ public class Transaction {
     @Column(name = "id_transaction")
     private int idTransaction;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false) // Relacionamento com a conta de origem
+    @ManyToOne(fetch = FetchType.EAGER, optional = false) // Relacionamento com a conta de origem
     @JoinColumn(name = "source_account_id", nullable = false) // Chave estrangeira
     private Account sourceAccount;
 
-    @ManyToOne(fetch = FetchType.LAZY) // Relacionamento com a conta de destino (pode ser null)
+    @ManyToOne(fetch = FetchType.EAGER) // Relacionamento com a conta de destino (pode ser null)
     @JoinColumn(name = "destination_account_id")
     private Account destinationAccount;
 

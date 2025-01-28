@@ -3,6 +3,7 @@ package br.com.compass.service;
 import br.com.compass.model.Account;
 import br.com.compass.model.Transaction;
 import br.com.compass.model.TransactionType;
+import br.com.compass.util.JpaUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 
@@ -11,16 +12,11 @@ import java.time.LocalDateTime;
 
 public class AccountService {
 
-    private final EntityManager em;
-
-    // Injeção do EntityManager no serviço
-    public AccountService(EntityManager em) {
-        this.em = em;
-    }
-
-    // Método para abrir conta (já existente)
+    // Método para abrir conta
     public boolean openAccount(Account account) {
+        EntityManager em = JpaUtil.getEntityManager(); // Obter o EntityManager do JpaUtil
         EntityTransaction transaction = em.getTransaction();
+
         try {
             transaction.begin();
             em.persist(account); // Salvar a conta no banco de dados
@@ -33,16 +29,20 @@ public class AccountService {
             }
             System.err.println("Error while opening account: " + e.getMessage());
             return false;
+        } finally {
+            em.close(); // Certifique-se de fechar o EntityManager
         }
     }
 
-    // Metodo para depósito
+    // Método para depósito
     public void deposit(Account account, BigDecimal amount) {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Deposit amount must be greater than zero.");
         }
 
+        EntityManager em = JpaUtil.getEntityManager(); // Obter o EntityManager do JpaUtil
         EntityTransaction transaction = em.getTransaction();
+
         try {
             transaction.begin();
 
@@ -53,21 +53,22 @@ public class AccountService {
             // Criar e salvar a transação de depósito
             Transaction depositTransaction = new Transaction(
                     account, // Conta de origem
-                    null, // Sem conta de destino para depósitos
-                    TransactionType.DEPOSIT, // Tipo de transação
-                    amount, // Valor do depósito
+                    null,    // Sem conta de destino para depósitos
+                    TransactionType.DEPOSIT,
+                    amount,
                     LocalDateTime.now() // Timestamp da transação
             );
-            em.persist(depositTransaction); // Salvar a transação no banco de dados
+            em.persist(depositTransaction);
 
-            transaction.commit(); // Confirmar a transação no banco
+            transaction.commit();
             System.out.println("Deposit successful. New balance: " + account.getBalance());
         } catch (Exception e) {
-            // Fazer rollback em caso de falha
             if (transaction.isActive()) {
                 transaction.rollback();
             }
             throw new RuntimeException("Failed to perform deposit: " + e.getMessage(), e);
+        } finally {
+            em.close(); // Certifique-se de fechar o EntityManager
         }
     }
 
@@ -80,7 +81,9 @@ public class AccountService {
             throw new IllegalArgumentException("Insufficient balance for withdrawal");
         }
 
+        EntityManager em = JpaUtil.getEntityManager(); // Obter o EntityManager do JpaUtil
         EntityTransaction transaction = em.getTransaction();
+
         try {
             transaction.begin();
 
@@ -105,6 +108,8 @@ public class AccountService {
                 transaction.rollback();
             }
             throw new RuntimeException("Failed to perform withdrawal: " + e.getMessage(), e);
+        } finally {
+            em.close(); // Certifique-se de fechar o EntityManager
         }
     }
 
@@ -123,7 +128,9 @@ public class AccountService {
             throw new IllegalArgumentException("Insufficient balance for transfer");
         }
 
+        EntityManager em = JpaUtil.getEntityManager(); // Obter o EntityManager do JpaUtil
         EntityTransaction transaction = em.getTransaction();
+
         try {
             transaction.begin();
 
@@ -150,6 +157,8 @@ public class AccountService {
                 transaction.rollback();
             }
             throw new RuntimeException("Failed to perform transfer: " + e.getMessage(), e);
+        } finally {
+            em.close(); // Certifique-se de fechar o EntityManager
         }
     }
 }

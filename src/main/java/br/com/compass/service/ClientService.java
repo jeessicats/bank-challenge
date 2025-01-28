@@ -64,17 +64,6 @@ public class ClientService {
         }
     }
 
-    public String captureValidCpf(Scanner scanner) {
-        while (true) {
-            System.out.print("Enter your CPF (11 digits, numbers only): ");
-            String cpf = scanner.nextLine();
-            if (ClientValidator.isValidCpf(cpf)) {
-                return cpf;
-            }
-            System.out.println("Invalid CPF format. Please try again.");
-        }
-    }
-
     public String captureValidPhoneNumber(Scanner scanner) {
         while (true) {
             System.out.print("Enter your phone number with the local code (10 or 11 digits, numbers only): ");
