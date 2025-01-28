@@ -27,7 +27,7 @@ public class AccountRepository {
             query.setParameter("cpf", cpf);
             return query.getSingleResult();
         } catch (NoResultException e) {
-            return null;  // Retorna null se não encontrar
+            return null;
         } catch (NonUniqueResultException e) {
             throw new IllegalStateException("Multiple clients found with the same CPF.");
         }
@@ -39,10 +39,10 @@ public class AccountRepository {
             String jpql = "SELECT a FROM Account a WHERE a.client.cpf = :cpf";
             TypedQuery<Account> query = em.createQuery(jpql, Account.class);
             query.setParameter("cpf", cpf);
-            return query.getResultList();  // Retorna lista, pode ser vazia
+            return query.getResultList();
         } catch (Exception e) {
             System.err.println("Error fetching accounts: " + e.getMessage());
-            return Collections.emptyList();  // Retorna lista vazia em caso de erro
+            return Collections.emptyList();
         }
     }
 
@@ -52,13 +52,13 @@ public class AccountRepository {
             em.getTransaction().begin();
             em.persist(account);
             em.getTransaction().commit();
-            return true;  // Sucesso na operação
+            return true;
         } catch (Exception e) {
             if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();  // Realiza rollback em caso de erro
+                em.getTransaction().rollback();
             }
             System.err.println("Error saving account: " + e.getMessage());
-            return false;  // Retorna false se falhar
+            return false;
         }
     }
 }

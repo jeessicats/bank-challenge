@@ -24,9 +24,8 @@ public class App {
 
         // Inicializar os repositórios e serviços que precisarão do JpaUtil
         AccountRepository accountRepository = new AccountRepository(em);
-        TransactionRepository transactionRepository = new TransactionRepository();
+        TransactionRepository transactionRepository = new TransactionRepository(em);
         AccountService accountService = new AccountService();
-        ClientRepository clientRepository = new ClientRepository(em);
 
         Scanner scanner = new Scanner(System.in);
 
@@ -173,14 +172,15 @@ public class App {
             try {
                 System.out.println("Please enter the following details to open a new account:");
 
-                // Captura todos os dados do cliente diretamente do ClientService
+                // Captura todos os dados do cliente
                 Client client = clientService.captureClientDetails(scanner);
 
-                // Salvar cliente no banco de dados
+                // Verificar se o CPF já existe antes de tentar salvar o cliente
                 if (!clientRepository.save(client)) {
-                    System.err.println("Failed to save client.");
-                    continue;
+                    System.out.println();  // Pula uma linha
+                    continue; // Reinicia o loop
                 }
+
                 System.out.println("Client saved successfully!");
 
                 // Selecionar o tipo de conta
@@ -192,7 +192,7 @@ public class App {
                 // Salvar conta no banco de dados
                 if (!accountRepository.save(account)) {
                     System.err.println("Failed to save account.");
-                    continue;
+                    continue; // Reinicia o loop
                 }
 
                 // Exibir detalhes da conta criada
@@ -253,7 +253,7 @@ public class App {
 
     private static void handleWithdraw(Scanner scanner, AccountRepository accountRepository, AccountService accountService) {
         try {
-            // Utilizar o método refatorado para selecionar a conta
+            // Selecionar a conta
             Account selectedAccount = selectAccount(scanner, accountRepository);
             if (selectedAccount == null) return;
 
@@ -278,7 +278,7 @@ public class App {
                 }
             }
 
-            // Formatar o valor do saque para exibição
+            // Formatar o valor do saque
             String formattedWithdrawAmount = AccountService.formatCurrency(withdrawAmount.doubleValue());
 
             // Realizar o saque
@@ -297,7 +297,7 @@ public class App {
 
     private static void handleCheckBalance(Scanner scanner, AccountRepository accountRepository) {
         try {
-            // Utilizar o método refatorado para selecionar a conta
+            // Selecionar a conta
             Account selectedAccount = selectAccount(scanner, accountRepository);
             if (selectedAccount == null) return;
 
@@ -315,7 +315,7 @@ public class App {
 
     private static void handleTransfer(Scanner scanner, AccountRepository accountRepository, AccountService accountService) {
         try {
-            // Selecionar a conta de origem usando o método refatorado
+            // Selecionar a conta de origem
             Account sourceAccount = selectAccount(scanner, accountRepository);
             if (sourceAccount == null) return;
 
@@ -377,7 +377,7 @@ public class App {
                 }
             }
 
-            // Formatar o valor da transferência para exibição
+            // Formatar o valor da transferência
             String formattedTransferAmount = AccountService.formatCurrency(transferAmount.doubleValue());
 
             // Realizar a transferência
@@ -398,7 +398,7 @@ public class App {
 
     private static void handleBankStatement(Scanner scanner, TransactionRepository transactionRepository, AccountRepository accountRepository) {
         try {
-            // Utilizar o método refatorado para selecionar a conta
+            // Selecionar a conta
             Account selectedAccount = selectAccount(scanner, accountRepository);
             if (selectedAccount == null) return;
 
@@ -416,7 +416,7 @@ public class App {
                     String formattedAmount = AccountService.formatCurrency(transaction.getAmount().doubleValue());
 
                     System.out.println("Type: " + transaction.getType());
-                    System.out.println("Amount: " + formattedAmount); // Valor formatado
+                    System.out.println("Amount: " + formattedAmount);
                     System.out.println("Date: " + transaction.getTimestamp());
 
                     if (transaction.getType() == TransactionType.TRANSFER) {
@@ -466,13 +466,13 @@ public class App {
                 return;
             }
 
-            // Método para selecionar o tipo de conta
+            // Selecionar o tipo de conta
             AccountType selectedAccountType = selectAccountType(scanner, availableAccountTypes);
 
             // Criar a conta
             Account newAccount = new Account(loggedClient, selectedAccountType);
             if (accountRepository.save(newAccount)) {
-                // Usar o método formatCurrency para formatar o saldo
+                // Formatar o saldo
                 String formattedBalance = AccountService.formatCurrency(newAccount.getBalance().doubleValue());
 
                 System.out.println("Account created successfully!");
