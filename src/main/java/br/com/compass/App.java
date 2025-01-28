@@ -26,11 +26,13 @@ public class App {
         AccountRepository accountRepository = new AccountRepository(em);
         TransactionRepository transactionRepository = new TransactionRepository(em);
         AccountService accountService = new AccountService();
+        ClientRepository clientRepository = new ClientRepository(em);
+        ClientService clientService = new ClientService();
 
         Scanner scanner = new Scanner(System.in);
 
         // Iniciar o menu principal
-        mainMenu(scanner, accountRepository, accountService, transactionRepository);
+        mainMenu(scanner, accountRepository, accountService, transactionRepository, clientService, clientRepository);
 
         scanner.close();
 
@@ -40,7 +42,7 @@ public class App {
         System.out.println("Application closed");
     }
 
-    public static void mainMenu(Scanner scanner, AccountRepository accountRepository, AccountService accountService, TransactionRepository transactionRepository) {
+    public static void mainMenu(Scanner scanner, AccountRepository accountRepository, AccountService accountService, TransactionRepository transactionRepository, ClientService clientService, ClientRepository clientRepository) {
         boolean running = true;
 
         while (running) {
@@ -57,10 +59,10 @@ public class App {
 
             switch (option) {
                 case 1:
-                    loginMenu(scanner, accountRepository, accountService, transactionRepository);
+                    loginMenu(scanner, accountRepository, accountService, transactionRepository, clientService, clientRepository);
                     return;
                 case 2:
-                    accountOpeningMenu(scanner, accountRepository);
+                    accountOpeningMenu(scanner, accountRepository, clientService, clientRepository);
                     break;
                 case 0:
                     running = false;
@@ -72,7 +74,7 @@ public class App {
     }
 
     // Menu login
-    public static void loginMenu(Scanner scanner, AccountRepository accountRepository, AccountService accountService, TransactionRepository transactionRepository) {
+    public static void loginMenu(Scanner scanner, AccountRepository accountRepository, AccountService accountService, TransactionRepository transactionRepository, ClientService clientService, ClientRepository clientRepository) {
         boolean running = true;
 
         while (running) {
@@ -96,7 +98,7 @@ public class App {
                     loggedClient = client;
                     System.out.println("Login successful! Welcome, " + client.getFullName() + "!");
                     System.out.println();
-                    bankMenu(scanner, accountRepository, accountService, transactionRepository);
+                    bankMenu(scanner, accountRepository, accountService, transactionRepository, clientService, clientRepository);
                     running = false; // Finaliza o loop após o login bem-sucedido
                 } else {
                     System.out.println("Invalid password. Please try again.");
@@ -108,7 +110,7 @@ public class App {
         }
     }
 
-    public static void bankMenu(Scanner scanner, AccountRepository accountRepository, AccountService accountService, TransactionRepository transactionRepository) {
+    public static void bankMenu(Scanner scanner, AccountRepository accountRepository, AccountService accountService, TransactionRepository transactionRepository, ClientService clientService, ClientRepository clientRepository) {
         boolean running = true;
 
         while (running) {
@@ -149,7 +151,7 @@ public class App {
                 case 0:
                     // ToDo...
                     System.out.println("Returning to Main Menu...");
-                    mainMenu(scanner, accountRepository, accountService, transactionRepository);
+                    mainMenu(scanner, accountRepository, accountService, transactionRepository, clientService, clientRepository);
                     return;
                 default:
                     System.out.println("Invalid option! Please try again.");
@@ -158,13 +160,9 @@ public class App {
     }
 
     // Menu de abertura de conta
-    public static void accountOpeningMenu(Scanner scanner, AccountRepository accountRepository) {
+    public static void accountOpeningMenu(Scanner scanner, AccountRepository accountRepository, ClientService clientService, ClientRepository clientRepository) {
         System.out.println();
         System.out.println("========= Account Opening Menu =========");
-
-        EntityManager em = JpaUtil.getEntityManager(); // Obter o EntityManager
-        ClientService clientService = new ClientService(); // Inicializar o ClientService fora do loop
-        ClientRepository clientRepository = new ClientRepository(em); // Repositório de cliente
 
         boolean running = true;
 
