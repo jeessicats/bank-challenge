@@ -61,7 +61,6 @@ public class AccountService {
             em.persist(depositTransaction);
 
             transaction.commit();
-            System.out.println("Deposit successful. New balance: " + account.getBalance());
         } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();
@@ -93,7 +92,6 @@ public class AccountService {
             em.persist(withdrawalTransaction);
 
             transaction.commit();
-            System.out.println("Withdrawal successful. New balance: " + account.getBalance());
         } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();
@@ -134,7 +132,6 @@ public class AccountService {
             em.persist(transferTransaction);
 
             transaction.commit();
-            System.out.println("Transfer successful. New balance: " + sourceAccount.getBalance());
         } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();
