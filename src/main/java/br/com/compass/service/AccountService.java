@@ -61,6 +61,7 @@ public class AccountService {
             em.persist(depositTransaction);
 
             transaction.commit();
+
         } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();

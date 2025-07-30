@@ -240,6 +240,7 @@ public class App {
 
             // Exibir mensagem de sucesso e o saldo atualizado
             String formattedUpdatedBalance = AccountService.formatCurrency(selectedAccount.getBalance().doubleValue());
+            System.out.println();
             System.out.println("Deposit completed successfully!");
             System.out.println("Deposited amount: " + formattedDepositAmount);
             System.out.println("Your updated balance: " + formattedUpdatedBalance);
@@ -284,6 +285,7 @@ public class App {
 
             // Exibir mensagem de sucesso e o saldo atualizado
             String formattedUpdatedBalance = AccountService.formatCurrency(selectedAccount.getBalance().doubleValue());
+            System.out.println();
             System.out.println("Withdrawal completed successfully!");
             System.out.println("Withdrawn amount: " + formattedWithdrawAmount);
             System.out.println("Your updated balance: " + formattedUpdatedBalance);
@@ -303,6 +305,7 @@ public class App {
             String formattedBalance = AccountService.formatCurrency(selectedAccount.getBalance().doubleValue());
 
             // Exibir o tipo de conta e o saldo formatado
+            System.out.println();
             System.out.println("Account Type: " + selectedAccount.getAccountType());
             System.out.println("Balance: " + formattedBalance);
 
@@ -385,6 +388,7 @@ public class App {
             String formattedUpdatedBalance = AccountService.formatCurrency(sourceAccount.getBalance().doubleValue());
 
             // Exibir mensagem de sucesso
+            System.out.println();
             System.out.println("Transfer completed successfully!");
             System.out.println("Transferred " + formattedTransferAmount + " from " + sourceAccount.getAccountType() +
                     " to " + destinationAccount.getAccountType() + " (Recipient: " + recipientName + ")");
@@ -406,6 +410,7 @@ public class App {
                 System.out.println("No transactions found for this account.");
             } else {
                 // Cabeçalho do extrato
+                System.out.println();
                 System.out.println("Bank Statement for " + loggedClient.getFullName() + " - CPF: " + loggedClient.getCpf());
                 System.out.println("----------------------------------");
 
